@@ -43,6 +43,8 @@
       transition: background .2s ease, color .2s ease;
     }
 
+    body.modal-open { overflow: hidden; }
+
     .page {
       width: min(100% - 32px, 690px);
       margin: 26px auto 60px;
@@ -72,7 +74,8 @@
     .choose-button,
     .remove-button,
     .download-button,
-    .reset-button {
+    .reset-button,
+    .welcome-button {
       border: 1.5px solid var(--border);
       border-radius: 8px;
       color: var(--pink-dark);
@@ -160,21 +163,9 @@
       font: 700 .96rem "Gaegu", "Comic Sans MS", cursive;
     }
 
-    .budget-counter.low {
-      border-color: #f1a62c;
-      color: #b66f00;
-    }
-
-    .budget-counter.empty {
-      border-color: #df397c;
-      color: #df397c;
-    }
-
-    .budget-number {
-      display: inline-block;
-      min-width: 1.2em;
-      font-size: 1.14em;
-    }
+    .budget-counter.low { border-color: #f1a62c; color: #b66f00; }
+    .budget-counter.empty { border-color: #df397c; color: #df397c; }
+    .budget-number { display: inline-block; min-width: 1.2em; font-size: 1.14em; }
 
     .error {
       min-height: 1.2em;
@@ -184,11 +175,7 @@
       font-size: .88rem;
     }
 
-    .workspace {
-      display: none;
-      margin-top: 22px;
-    }
-
+    .workspace { display: none; margin-top: 22px; }
     .workspace.visible { display: block; }
 
     .preview-grid {
@@ -233,11 +220,7 @@
       background-position: 0 0, 0 11px, 11px -11px, -11px 0;
     }
 
-    .image-area img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
+    .image-area img { width: 100%; height: 100%; object-fit: contain; }
 
     .result-placeholder {
       padding: 18px;
@@ -281,13 +264,9 @@
       margin-top: 16px;
     }
 
-    .remove-button,
-    .download-button,
-    .reset-button { padding: 8px 14px; }
+    .remove-button, .download-button, .reset-button { padding: 8px 14px; }
 
-    .remove-button,
-    .download-button,
-    .support-button {
+    .remove-button, .download-button, .support-button, .welcome-button {
       border-color: var(--pink);
       background: var(--pink);
       color: white;
@@ -296,7 +275,8 @@
 
     .remove-button:hover:not(:disabled),
     .download-button:hover:not([hidden]),
-    .support-button:hover {
+    .support-button:hover,
+    .welcome-button:hover {
       background: var(--pink-dark);
       transform: translateY(-1px);
     }
@@ -347,7 +327,7 @@
       transition: transform .15s ease, background .15s ease;
     }
 
-    .support-button:focus-visible {
+    .support-button:focus-visible, .welcome-button:focus-visible {
       outline: 3px solid var(--pink-soft);
       outline-offset: 3px;
     }
@@ -360,17 +340,72 @@
       font: 400 .9rem/1.35 "Gaegu", "Comic Sans MS", cursive;
     }
 
+    .welcome-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      background: rgba(54, 33, 48, .38);
+      backdrop-filter: blur(4px);
+    }
+
+    .welcome-overlay[hidden] { display: none !important; }
+
+    .welcome-card {
+      width: min(100%, 500px);
+      padding: 25px 23px 22px;
+      border: 2px solid var(--border);
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: 0 18px 50px rgba(94, 39, 70, .25);
+      text-align: center;
+    }
+
+    .welcome-card h2 {
+      margin: 0 0 9px;
+      color: var(--pink);
+      font: 700 clamp(2.15rem, 9vw, 3.1rem)/.9 "Gaegu", "Comic Sans MS", cursive;
+    }
+
+    .welcome-card p {
+      max-width: 400px;
+      margin: 0 auto 12px;
+      color: var(--ink);
+      font: 400 1.07rem/1.4 "Gaegu", "Comic Sans MS", cursive;
+    }
+
+    .welcome-card .tiny-note {
+      margin-bottom: 17px;
+      color: var(--muted);
+      font-size: .94rem;
+    }
+
+    .welcome-button { padding: 9px 17px; font-size: 1.14rem; }
+
     @media (max-width: 560px) {
       .page { width: min(100% - 24px, 690px); margin-top: 18px; }
       h1 { margin-bottom: 22px; }
       .preview-grid { grid-template-columns: 1fr; }
       .topbar { gap: 9px; }
       .theme-toggle { font-size: .85rem; }
+      .welcome-card { padding: 23px 18px 20px; }
     }
   </style>
 </head>
-<body>
-  <main class="page">
+<body class="modal-open">
+  <section class="welcome-overlay" id="welcomeOverlay" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" aria-describedby="welcomeDescription">
+    <div class="welcome-card">
+      <h2 id="welcomeTitle">tiny heads up :3</h2>
+      <p id="welcomeDescription">this is a free little background remover thing, so it might not always remove every artifact perfectly. especially tiny details like hair, fur, glass, shadows, or busy backgrounds.</p>
+      <p>if enough funding is achieved, more work can go into better processing, improvements, and making the removy thingy clearer for everyone ♡</p>
+      <p class="tiny-note">please use it knowing it is a beta and results can vary :]</p>
+      <button class="welcome-button" id="enterSiteButton" type="button">okie, let me in :D</button>
+    </div>
+  </section>
+
+  <main class="page" id="siteContent" aria-hidden="true">
     <div class="topbar">
       <h1>background removy<br>thingy :3</h1>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">dark mode :3</button>
@@ -386,7 +421,7 @@
 
     <button class="action-link" id="uploadLink" type="button">upload an image :]</button>
     <p class="tip">tip: a clear subject makes the removy thingy less likely to yeet important pixels :3</p>
-    <p class="budget-counter" id="budgetCounter" aria-live="polite">free removies left today-ish: <span class="budget-number" id="budgetNumber">99</span> :3</p>
+    <p class="budget-counter" id="budgetCounter" aria-live="polite">free removies left: <span class="budget-number" id="budgetNumber">99</span> :3</p>
     <p class="error" id="errorMessage" role="alert"></p>
 
     <section class="workspace" id="workspace" aria-live="polite">
@@ -395,7 +430,6 @@
           <h2>before :]</h2>
           <div class="image-area"><img id="originalPreview" alt="Your selected image" /></div>
         </article>
-
         <article class="preview-card">
           <h2>after :3</h2>
           <div class="image-area checkerboard">
@@ -405,7 +439,6 @@
           </div>
         </article>
       </div>
-
       <div class="controls">
         <button class="remove-button" id="removeButton" type="button">remove background :3</button>
         <a class="download-button" id="downloadButton" download="no-background.png" hidden>download png :D</a>
@@ -428,9 +461,12 @@
     const API_ENDPOINT = "/api/remove-background";
     const SUPPORT_LINK = ""; // Example: "https://ko-fi.com/yourname" or "https://buymeacoffee.com/yourname"
     const STARTING_BRIA_CREDITS = 100;
-    const SUCCESSFUL_REMOVALS_BEFORE_COUNTER = 1; // You already used one Bria call while testing.
+    const SUCCESSFUL_REMOVALS_BEFORE_COUNTER = 1;
     const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
+    const welcomeOverlay = document.getElementById("welcomeOverlay");
+    const enterSiteButton = document.getElementById("enterSiteButton");
+    const siteContent = document.getElementById("siteContent");
     const fileInput = document.getElementById("fileInput");
     const dropZone = document.getElementById("dropZone");
     const uploadLink = document.getElementById("uploadLink");
@@ -446,12 +482,27 @@
     const themeToggle = document.getElementById("themeToggle");
     const supportLink = document.getElementById("supportLink");
     const budgetCounter = document.getElementById("budgetCounter");
-    const budgetNumber = document.getElementById("budgetNumber");
 
     let selectedFile = null;
     let originalUrl = null;
     let resultUrl = null;
     let callsLeft = STARTING_BRIA_CREDITS - SUCCESSFUL_REMOVALS_BEFORE_COUNTER;
+
+    function enterSite() {
+      welcomeOverlay.hidden = true;
+      siteContent.setAttribute("aria-hidden", "false");
+      document.body.classList.remove("modal-open");
+      localStorage.setItem("removy-disclaimer-seen", "yes");
+    }
+
+    // Show the heads-up once per browser. Delete this block if you want it on every visit.
+    if (localStorage.getItem("removy-disclaimer-seen") === "yes") {
+      enterSite();
+    } else {
+      enterSiteButton.focus();
+    }
+
+    enterSiteButton.addEventListener("click", enterSite);
 
     function setError(message = "") {
       errorMessage.textContent = message;
@@ -459,21 +510,14 @@
 
     function updateBudgetCounter(nextCallsLeft) {
       if (!Number.isFinite(nextCallsLeft)) return;
-
       callsLeft = Math.max(0, Math.floor(nextCallsLeft));
-      budgetNumber.textContent = callsLeft;
       budgetCounter.classList.toggle("low", callsLeft > 0 && callsLeft <= 15);
       budgetCounter.classList.toggle("empty", callsLeft === 0);
-
-      if (callsLeft === 0) {
-        budgetCounter.innerHTML = 'free removies left: <span class="budget-number" id="budgetNumber">0</span> :[ more soon maybe';
-      } else {
-        budgetCounter.innerHTML = `free removies left: <span class="budget-number" id="budgetNumber">${callsLeft}</span> :3`;
-      }
+      budgetCounter.innerHTML = callsLeft === 0
+        ? 'free removies left: <span class="budget-number">0</span> :[ more soon maybe'
+        : `free removies left: <span class="budget-number">${callsLeft}</span> :3`;
     }
 
-    // Set the visible count to 99 immediately. After each successful result, the
-    // backend's X-Removy-Calls-Left header updates it using the real shared counter.
     updateBudgetCounter(callsLeft);
 
     if (SUPPORT_LINK) {
@@ -492,12 +536,10 @@
     function selectFile(file) {
       setError();
       if (!file) return;
-
       if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
         setError("please choose a PNG, JPG, or WebP image :[");
         return;
       }
-
       if (file.size > MAX_FILE_SIZE) {
         setError("that image is over 10 MB—please pick a smaller one :[");
         return;
@@ -508,7 +550,6 @@
       revokeUrl(resultUrl);
       originalUrl = URL.createObjectURL(file);
       resultUrl = null;
-
       originalPreview.src = originalUrl;
       resultPreview.hidden = true;
       resultPreview.removeAttribute("src");
@@ -531,11 +572,7 @@
       try {
         const formData = new FormData();
         formData.append("image", selectedFile, selectedFile.name);
-
-        const response = await fetch(API_ENDPOINT, {
-          method: "POST",
-          body: formData
-        });
+        const response = await fetch(API_ENDPOINT, { method: "POST", body: formData });
 
         if (!response.ok) {
           let message = "the removy thingy had a little oopsie. please try again :[";
@@ -552,11 +589,7 @@
         }
 
         const remainingFromServer = Number(response.headers.get("X-Removy-Calls-Left"));
-        if (Number.isFinite(remainingFromServer)) {
-          updateBudgetCounter(remainingFromServer);
-        } else {
-          updateBudgetCounter(callsLeft - 1);
-        }
+        updateBudgetCounter(Number.isFinite(remainingFromServer) ? remainingFromServer : callsLeft - 1);
 
         revokeUrl(resultUrl);
         resultUrl = URL.createObjectURL(imageBlob);
@@ -600,14 +633,12 @@
         dropZone.classList.add("dragover");
       });
     });
-
     ["dragleave", "drop"].forEach((eventName) => {
       dropZone.addEventListener(eventName, (event) => {
         event.preventDefault();
         dropZone.classList.remove("dragover");
       });
     });
-
     dropZone.addEventListener("drop", (event) => selectFile(event.dataTransfer.files[0]));
 
     const savedTheme = localStorage.getItem("removy-theme");
@@ -618,7 +649,6 @@
     }
 
     syncThemeText();
-
     themeToggle.addEventListener("click", () => {
       const dark = document.documentElement.dataset.theme !== "dark";
       document.documentElement.dataset.theme = dark ? "dark" : "";
