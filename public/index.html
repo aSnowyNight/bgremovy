@@ -146,6 +146,36 @@
       letter-spacing: .02em;
     }
 
+    .budget-counter {
+      width: fit-content;
+      max-width: 100%;
+      margin: 13px auto 0;
+      padding: 6px 11px;
+      border: 1px solid var(--pink-soft);
+      border-radius: 999px;
+      color: var(--pink-dark);
+      background: var(--surface);
+      box-shadow: 0 4px 12px var(--shadow);
+      text-align: center;
+      font: 700 .96rem "Gaegu", "Comic Sans MS", cursive;
+    }
+
+    .budget-counter.low {
+      border-color: #f1a62c;
+      color: #b66f00;
+    }
+
+    .budget-counter.empty {
+      border-color: #df397c;
+      color: #df397c;
+    }
+
+    .budget-number {
+      display: inline-block;
+      min-width: 1.2em;
+      font-size: 1.14em;
+    }
+
     .error {
       min-height: 1.2em;
       margin: 12px 0 0;
@@ -356,6 +386,7 @@
 
     <button class="action-link" id="uploadLink" type="button">upload an image :]</button>
     <p class="tip">tip: a clear subject makes the removy thingy less likely to yeet important pixels :3</p>
+    <p class="budget-counter" id="budgetCounter" aria-live="polite">free removies left today-ish: <span class="budget-number" id="budgetNumber">99</span> :3</p>
     <p class="error" id="errorMessage" role="alert"></p>
 
     <section class="workspace" id="workspace" aria-live="polite">
@@ -387,18 +418,17 @@
     <section class="support-card" aria-labelledby="support-title">
       <h2 id="support-title">keep the removy thingy alive? ♡</h2>
       <p>it is free to use :3 if it helped u and u wanna support it, tiny tips help cover the api + hosting costs.</p>
-      <!-- Replace the # below with your Ko-fi OR Buy Me a Coffee profile link before deploying. -->
       <a class="support-button" href="#" id="supportLink" target="_blank" rel="noopener noreferrer">support the removy thingy :D</a>
     </section>
 
-    <p class="fair-use">free while the removy budget lasts :3 to keep things fair, uploads may be limited during busy times.</p>
+    <p class="fair-use">beta mode :3 there are limited free removies while the api credits last.</p>
   </main>
 
   <script>
-    // Change only these two settings before deploying.
-    // Use a relative endpoint when the API route is hosted in the same Vercel project.
     const API_ENDPOINT = "/api/remove-background";
     const SUPPORT_LINK = ""; // Example: "https://ko-fi.com/yourname" or "https://buymeacoffee.com/yourname"
+    const STARTING_BRIA_CREDITS = 100;
+    const SUCCESSFUL_REMOVALS_BEFORE_COUNTER = 1; // You already used one Bria call while testing.
     const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
     const fileInput = document.getElementById("fileInput");
@@ -415,10 +445,36 @@
     const loadingState = document.getElementById("loadingState");
     const themeToggle = document.getElementById("themeToggle");
     const supportLink = document.getElementById("supportLink");
+    const budgetCounter = document.getElementById("budgetCounter");
+    const budgetNumber = document.getElementById("budgetNumber");
 
     let selectedFile = null;
     let originalUrl = null;
     let resultUrl = null;
+    let callsLeft = STARTING_BRIA_CREDITS - SUCCESSFUL_REMOVALS_BEFORE_COUNTER;
+
+    function setError(message = "") {
+      errorMessage.textContent = message;
+    }
+
+    function updateBudgetCounter(nextCallsLeft) {
+      if (!Number.isFinite(nextCallsLeft)) return;
+
+      callsLeft = Math.max(0, Math.floor(nextCallsLeft));
+      budgetNumber.textContent = callsLeft;
+      budgetCounter.classList.toggle("low", callsLeft > 0 && callsLeft <= 15);
+      budgetCounter.classList.toggle("empty", callsLeft === 0);
+
+      if (callsLeft === 0) {
+        budgetCounter.innerHTML = 'free removies left: <span class="budget-number" id="budgetNumber">0</span> :[ more soon maybe';
+      } else {
+        budgetCounter.innerHTML = `free removies left: <span class="budget-number" id="budgetNumber">${callsLeft}</span> :3`;
+      }
+    }
+
+    // Set the visible count to 99 immediately. After each successful result, the
+    // backend's X-Removy-Calls-Left header updates it using the real shared counter.
+    updateBudgetCounter(callsLeft);
 
     if (SUPPORT_LINK) {
       supportLink.href = SUPPORT_LINK;
@@ -427,10 +483,6 @@
         event.preventDefault();
         setError("add your Ko-fi or Buy Me a Coffee link in SUPPORT_LINK first :3");
       });
-    }
-
-    function setError(message = "") {
-      errorMessage.textContent = message;
     }
 
     function revokeUrl(url) {
@@ -463,11 +515,14 @@
       resultPlaceholder.hidden = false;
       downloadButton.hidden = true;
       workspace.classList.add("visible");
-      removeButton.disabled = false;
+      removeButton.disabled = callsLeft <= 0;
     }
 
     async function removeBackground() {
-      if (!selectedFile) return;
+      if (!selectedFile || callsLeft <= 0) {
+        if (callsLeft <= 0) setError("the free removy budget is used up for now :[");
+        return;
+      }
 
       setError();
       removeButton.disabled = true;
@@ -484,18 +539,23 @@
 
         if (!response.ok) {
           let message = "the removy thingy had a little oopsie. please try again :[";
-
           try {
             const data = await response.json();
             message = data.error || message;
           } catch (_) {}
-
           throw new Error(message);
         }
 
         const imageBlob = await response.blob();
         if (!imageBlob.type.startsWith("image/")) {
           throw new Error("the server did not return an image. please try again :[");
+        }
+
+        const remainingFromServer = Number(response.headers.get("X-Removy-Calls-Left"));
+        if (Number.isFinite(remainingFromServer)) {
+          updateBudgetCounter(remainingFromServer);
+        } else {
+          updateBudgetCounter(callsLeft - 1);
         }
 
         revokeUrl(resultUrl);
@@ -509,7 +569,7 @@
         setError(error.message || "something went wrong :[");
       } finally {
         loadingState.classList.remove("visible");
-        removeButton.disabled = false;
+        removeButton.disabled = callsLeft <= 0;
       }
     }
 
