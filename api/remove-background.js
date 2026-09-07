@@ -8,7 +8,7 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 function sendJson(res, status, payload) {
   res.setHeader("Content-Type", "application/json");
-  res.status(status).send(JSON.stringify(payload));
+  return res.status(status).send(JSON.stringify(payload));
 }
 
 async function readRequestBody(req, limit) {
@@ -30,6 +30,56 @@ async function readRequestBody(req, limit) {
   return Buffer.concat(chunks);
 }
 
+function getImageFromMultipart(body, contentType) {
+  const boundaryMatch = contentType.match(/boundary=(?:"([^"]+)"|([^;]+))/i);
+
+  if (!boundaryMatch) {
+    throw new Error("Missing multipart boundary");
+  }
+
+  const boundary = Buffer.from(`--${boundaryMatch[1] || boundaryMatch[2]}`);
+  let cursor = 0;
+
+  while (cursor < body.length) {
+    const partStart = body.indexOf(boundary, cursor);
+
+    if (partStart === -1) break;
+
+    const headerStart = partStart + boundary.length;
+    const headerEnd = body.indexOf(Buffer.from("\\r\\n\\r\\n"), headerStart);
+
+    if (headerEnd === -1) break;
+
+    const headers = body
+      .subarray(headerStart, headerEnd)
+      .toString("utf8");
+
+    const nextBoundary = body.indexOf(boundary, headerEnd + 4);
+
+    if (nextBoundary === -1) break;
+
+    const partBodyEnd = nextBoundary - 2;
+    const partBody = body.subarray(headerEnd + 4, partBodyEnd);
+
+    const isImageField =
+      /name="image"/i.test(headers) &&
+      /filename="/i.test(headers);
+
+    if (isImageField) {
+      const mimeMatch = headers.match(/Content-Type:\s*([^\r\n]+)/i);
+
+      return {
+        buffer: partBody,
+        mimeType: mimeMatch ? mimeMatch[1].trim().toLowerCase() : ""
+      };
+    }
+
+    cursor = nextBoundary;
+  }
+
+  throw new Error("No image field was found");
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -38,12 +88,13 @@ export default async function handler(req, res) {
     });
   }
 
-  const token = process.env.HF_TOKEN;
+  const briaApiKey = process.env.BRIA_API_KEY;
 
-  if (!token) {
-    console.error("Missing HF_TOKEN environment variable.");
+  if (!briaApiKey) {
+    console.error("Missing BRIA_API_KEY environment variable.");
+
     return sendJson(res, 500, {
-      error: "server setup oopsie: the API token is missing :["
+      error: "server setup oopsie: the Bria API key is missing :["
     });
   }
 
@@ -56,55 +107,70 @@ export default async function handler(req, res) {
   }
 
   try {
-    /*
-      The current front end sends FormData. This function forwards that
-      multipart request without saving the image to Vercel storage.
-    */
-    const originalBody = await readRequestBody(req, MAX_FILE_SIZE);
+    const body = await readRequestBody(req, MAX_FILE_SIZE);
+    const { buffer, mimeType } = getImageFromMultipart(body, incomingType);
 
-    /*
-      IMPORTANT:
-      Replace this URL only after confirming which hosted provider/model
-      you are using and its current API requirements.
+    const allowedTypes = new Set([
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/webp"
+    ]);
 
-      This is an example router path, not a promise of free/unlimited access.
-    */
-    const providerResponse = await fetch(
-      "https://router.huggingface.co/hf-inference/models/briaai/RMBG-2.0",
+    if (!allowedTypes.has(mimeType)) {
+      return sendJson(res, 415, {
+        error: "please choose a JPG, PNG, or WebP image :["
+      });
+    }
+
+    const base64Image = buffer.toString("base64");
+
+    const briaResponse = await fetch(
+      "https://engine.prod.bria-api.com/v2/image/edit/remove_background",
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": incomingType,
-          Accept: "image/png,application/json"
+          "Content-Type": "application/json",
+          "api_token": briaApiKey
         },
-        body: originalBody
+        body: JSON.stringify({
+          image: base64Image,
+          preserve_alpha: true,
+          sync: true
+        })
       }
     );
 
-    if (!providerResponse.ok) {
-      const providerText = await providerResponse.text();
+    if (!briaResponse.ok) {
+      const details = await briaResponse.text();
+
       console.error(
-        "Background provider failed:",
-        providerResponse.status,
-        providerText.slice(0, 500)
+        "Bria provider failed:",
+        briaResponse.status,
+        details.slice(0, 800)
       );
 
-      if (providerResponse.status === 401 || providerResponse.status === 403) {
+      if (briaResponse.status === 401 || briaResponse.status === 403) {
         return sendJson(res, 502, {
-          error: "the removy service authorization needs fixing :["
+          error: "the Bria API key needs fixing :["
         });
       }
 
-      if (providerResponse.status === 429) {
+      if (briaResponse.status === 402 || briaResponse.status === 429) {
         return sendJson(res, 429, {
-          error: "the free removy budget is resting right now—please try again later :["
+          error: "the removy budget is resting right now—please try again later :["
         });
       }
 
-      if (providerResponse.status === 503) {
-        return sendJson(res, 503, {
-          error: "the removy AI is waking up—wait a moment and try again :3"
+      if (briaResponse.status === 415) {
+        return sendJson(res, 415, {
+          error: "Bria needs a JPG, PNG, or WebP image :["
+        });
+      }
+
+      if (briaResponse.status === 422) {
+        return sendJson(res, 422, {
+          error: "this image could not be processed by the removy service :["
         });
       }
 
@@ -113,18 +179,43 @@ export default async function handler(req, res) {
       });
     }
 
-    const resultBytes = Buffer.from(await providerResponse.arrayBuffer());
+    const briaData = await briaResponse.json();
+    const outputUrl = briaData?.result?.image_url;
 
-    if (resultBytes.length === 0) {
+    if (!outputUrl) {
+      console.error("Bria returned no image_url:", briaData);
+
       return sendJson(res, 502, {
-        error: "the removy service returned an empty image :["
+        error: "Bria did not return a finished image :["
+      });
+    }
+
+    const imageResponse = await fetch(outputUrl);
+
+    if (!imageResponse.ok) {
+      console.error("Could not download Bria result:", imageResponse.status);
+
+      return sendJson(res, 502, {
+        error: "the finished image could not be downloaded :["
+      });
+    }
+
+    const finalImage = Buffer.from(await imageResponse.arrayBuffer());
+
+    if (!finalImage.length) {
+      return sendJson(res, 502, {
+        error: "the finished image came back empty :["
       });
     }
 
     res.setHeader("Content-Type", "image/png");
-    res.setHeader("Content-Disposition", 'inline; filename="no-background.png"');
+    res.setHeader(
+      "Content-Disposition",
+      'inline; filename="no-background.png"'
+    );
     res.setHeader("Cache-Control", "no-store, max-age=0");
-    return res.status(200).send(resultBytes);
+
+    return res.status(200).send(finalImage);
   } catch (error) {
     console.error("remove-background error:", error);
 
