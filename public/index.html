@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A cute, simple background removal tool." />
+  <title>background removy thingy :3</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nunito:wght@400;600;700&display=swap');
+
+    :root {
+      --bg: #fffaff;
+      --surface: #fff8fd;
+      --pink: #ff74ae;
+      --pink-dark: #ed5b9a;
+      --pink-soft: #ffd7e8;
+      --ink: #6f6870;
+      --muted: #9a9299;
+      --border: #ff77b0;
+      --shadow: rgba(255, 116, 174, .18);
+    }
+
+    [data-theme="dark"] {
+      --bg: #211923;
+      --surface: #2c202e;
+      --pink: #ff8ec0;
+      --pink-dark: #ffaad0;
+      --pink-soft: #5e334e;
+      --ink: #f8eaf2;
+      --muted: #c9b8c3;
+      --border: #ff86ba;
+      --shadow: rgba(0, 0, 0, .3);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: "Nunito", system-ui, sans-serif;
+      transition: background .2s ease, color .2s ease;
+    }
+
+    .page {
+      width: min(100% - 32px, 690px);
+      margin: 26px auto 60px;
+      position: relative;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 18px;
+    }
+
+    h1 {
+      margin: 0 0 25px;
+      max-width: 440px;
+      color: var(--pink);
+      font-family: "Gaegu", "Comic Sans MS", cursive;
+      font-size: clamp(3rem, 7vw, 4.1rem);
+      font-weight: 700;
+      line-height: .78;
+      letter-spacing: .01em;
+      text-wrap: balance;
+    }
+
+    .theme-toggle,
+    .choose-button,
+    .remove-button,
+    .download-button,
+    .reset-button {
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      color: var(--pink-dark);
+      background: transparent;
+      font: 700 1rem "Gaegu", "Comic Sans MS", cursive;
+      cursor: pointer;
+      transition: transform .15s ease, background .15s ease, color .15s ease, box-shadow .15s ease;
+    }
+
+    .theme-toggle {
+      padding: 6px 9px;
+      white-space: nowrap;
+      font-size: .95rem;
+    }
+
+    .theme-toggle:hover,
+    .choose-button:hover,
+    .reset-button:hover {
+      background: var(--pink-soft);
+      transform: translateY(-1px);
+    }
+
+    .upload-card {
+      min-height: 148px;
+      display: grid;
+      place-items: center;
+      border: 2px dashed var(--border);
+      border-radius: 11px;
+      padding: 24px;
+      background: color-mix(in srgb, var(--surface) 88%, transparent);
+      text-align: center;
+      cursor: pointer;
+      transition: background .15s ease, transform .15s ease, box-shadow .15s ease;
+    }
+
+    .upload-card:hover,
+    .upload-card.dragover {
+      background: var(--pink-soft);
+      box-shadow: 0 8px 26px var(--shadow);
+      transform: translateY(-2px);
+    }
+
+    .upload-card p {
+      margin: 0 0 12px;
+      color: var(--pink);
+      font: 700 1.15rem "Gaegu", "Comic Sans MS", cursive;
+    }
+
+    .choose-button { padding: 6px 12px; }
+    input[type="file"] { display: none; }
+
+    .action-link {
+      display: block;
+      width: fit-content;
+      margin: 14px auto 0;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      color: var(--pink);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      font: 700 1rem "Gaegu", "Comic Sans MS", cursive;
+      cursor: pointer;
+    }
+
+    .tip {
+      margin: 8px 0 0;
+      color: var(--muted);
+      text-align: center;
+      font: 400 .92rem "Gaegu", "Comic Sans MS", cursive;
+      letter-spacing: .02em;
+    }
+
+    .error {
+      min-height: 1.2em;
+      margin: 12px 0 0;
+      color: #df397c;
+      text-align: center;
+      font-size: .88rem;
+    }
+
+    .workspace {
+      display: none;
+      margin-top: 22px;
+    }
+
+    .workspace.visible { display: block; }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 15px;
+    }
+
+    .preview-card {
+      overflow: hidden;
+      border: 1.5px solid var(--pink-soft);
+      border-radius: 13px;
+      background: var(--surface);
+      box-shadow: 0 8px 24px var(--shadow);
+    }
+
+    .preview-card h2 {
+      margin: 0;
+      padding: 8px 11px;
+      border-bottom: 1px solid var(--pink-soft);
+      color: var(--pink-dark);
+      font: 700 1.12rem "Gaegu", "Comic Sans MS", cursive;
+    }
+
+    .image-area {
+      position: relative;
+      aspect-ratio: 1 / .85;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .checkerboard {
+      background-color: #fff;
+      background-image:
+        linear-gradient(45deg, #f4e7ee 25%, transparent 25%),
+        linear-gradient(-45deg, #f4e7ee 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #f4e7ee 75%),
+        linear-gradient(-45deg, transparent 75%, #f4e7ee 75%);
+      background-size: 22px 22px;
+      background-position: 0 0, 0 11px, 11px -11px, -11px 0;
+    }
+
+    .image-area img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .result-placeholder {
+      padding: 18px;
+      color: var(--muted);
+      text-align: center;
+      font: 1rem "Gaegu", "Comic Sans MS", cursive;
+    }
+
+    .loading {
+      display: none;
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      place-items: center;
+      align-content: center;
+      gap: 9px;
+      background: rgba(255, 250, 255, .84);
+      color: var(--pink-dark);
+      font: 700 1.15rem "Gaegu", "Comic Sans MS", cursive;
+    }
+
+    [data-theme="dark"] .loading { background: rgba(33, 25, 35, .88); }
+    .loading.visible { display: grid; }
+
+    .spinner {
+      width: 30px;
+      height: 30px;
+      border: 4px solid var(--pink-soft);
+      border-top-color: var(--pink);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .remove-button,
+    .download-button,
+    .reset-button { padding: 8px 14px; }
+
+    .remove-button,
+    .download-button,
+    .support-button {
+      border-color: var(--pink);
+      background: var(--pink);
+      color: white;
+      box-shadow: 0 5px 13px var(--shadow);
+    }
+
+    .remove-button:hover:not(:disabled),
+    .download-button:hover:not([hidden]),
+    .support-button:hover {
+      background: var(--pink-dark);
+      transform: translateY(-1px);
+    }
+
+    button:disabled { cursor: wait; opacity: .68; }
+    [hidden] { display: none !important; }
+
+    .privacy {
+      margin: 20px auto 0;
+      max-width: 560px;
+      color: var(--muted);
+      text-align: center;
+      font-size: .75rem;
+      line-height: 1.45;
+    }
+
+    .support-card {
+      max-width: 540px;
+      margin: 24px auto 0;
+      padding: 17px 18px 19px;
+      border: 1.5px solid var(--pink-soft);
+      border-radius: 13px;
+      background: var(--surface);
+      box-shadow: 0 8px 24px var(--shadow);
+      text-align: center;
+    }
+
+    .support-card h2 {
+      margin: 0 0 5px;
+      color: var(--pink-dark);
+      font: 700 1.35rem "Gaegu", "Comic Sans MS", cursive;
+    }
+
+    .support-card p {
+      max-width: 420px;
+      margin: 0 auto 13px;
+      color: var(--muted);
+      font: 400 1rem/1.35 "Gaegu", "Comic Sans MS", cursive;
+    }
+
+    .support-button {
+      display: inline-block;
+      padding: 8px 14px;
+      border: 1.5px solid var(--pink);
+      border-radius: 8px;
+      font: 700 1.05rem "Gaegu", "Comic Sans MS", cursive;
+      text-decoration: none;
+      transition: transform .15s ease, background .15s ease;
+    }
+
+    .support-button:focus-visible {
+      outline: 3px solid var(--pink-soft);
+      outline-offset: 3px;
+    }
+
+    .fair-use {
+      max-width: 540px;
+      margin: 13px auto 0;
+      color: var(--muted);
+      text-align: center;
+      font: 400 .9rem/1.35 "Gaegu", "Comic Sans MS", cursive;
+    }
+
+    @media (max-width: 560px) {
+      .page { width: min(100% - 24px, 690px); margin-top: 18px; }
+      h1 { margin-bottom: 22px; }
+      .preview-grid { grid-template-columns: 1fr; }
+      .topbar { gap: 9px; }
+      .theme-toggle { font-size: .85rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="topbar">
+      <h1>background removy<br>thingy :3</h1>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">dark mode :3</button>
+    </div>
+
+    <label class="upload-card" id="dropZone" for="fileInput">
+      <div>
+        <p>put image here :P</p>
+        <span class="choose-button">choose image :3</span>
+      </div>
+    </label>
+    <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" />
+
+    <button class="action-link" id="uploadLink" type="button">upload an image :]</button>
+    <p class="tip">tip: a clear subject makes the removy thingy less likely to yeet important pixels :3</p>
+    <p class="error" id="errorMessage" role="alert"></p>
+
+    <section class="workspace" id="workspace" aria-live="polite">
+      <div class="preview-grid">
+        <article class="preview-card">
+          <h2>before :]</h2>
+          <div class="image-area"><img id="originalPreview" alt="Your selected image" /></div>
+        </article>
+
+        <article class="preview-card">
+          <h2>after :3</h2>
+          <div class="image-area checkerboard">
+            <div class="loading" id="loadingState"><span class="spinner"></span><span>removy-ing background...</span></div>
+            <img id="resultPreview" alt="Image with its background removed" hidden />
+            <p class="result-placeholder" id="resultPlaceholder">click the removy button when ur ready :]</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="controls">
+        <button class="remove-button" id="removeButton" type="button">remove background :3</button>
+        <a class="download-button" id="downloadButton" download="no-background.png" hidden>download png :D</a>
+        <button class="reset-button" id="resetButton" type="button">choose another image</button>
+      </div>
+    </section>
+
+    <p class="privacy">your image is sent to our background-removal provider only when you press remove background. we do not intentionally save your upload, but please do not upload sensitive or private images :3</p>
+
+    <section class="support-card" aria-labelledby="support-title">
+      <h2 id="support-title">keep the removy thingy alive? ♡</h2>
+      <p>it is free to use :3 if it helped u and u wanna support it, tiny tips help cover the api + hosting costs.</p>
+      <!-- Replace the # below with your Ko-fi OR Buy Me a Coffee profile link before deploying. -->
+      <a class="support-button" href="#" id="supportLink" target="_blank" rel="noopener noreferrer">support the removy thingy :D</a>
+    </section>
+
+    <p class="fair-use">free while the removy budget lasts :3 to keep things fair, uploads may be limited during busy times.</p>
+  </main>
+
+  <script>
+    // Change only these two settings before deploying.
+    // Use a relative endpoint when the API route is hosted in the same Vercel project.
+    const API_ENDPOINT = "/api/remove-background";
+    const SUPPORT_LINK = ""; // Example: "https://ko-fi.com/yourname" or "https://buymeacoffee.com/yourname"
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+    const fileInput = document.getElementById("fileInput");
+    const dropZone = document.getElementById("dropZone");
+    const uploadLink = document.getElementById("uploadLink");
+    const workspace = document.getElementById("workspace");
+    const originalPreview = document.getElementById("originalPreview");
+    const resultPreview = document.getElementById("resultPreview");
+    const resultPlaceholder = document.getElementById("resultPlaceholder");
+    const removeButton = document.getElementById("removeButton");
+    const downloadButton = document.getElementById("downloadButton");
+    const resetButton = document.getElementById("resetButton");
+    const errorMessage = document.getElementById("errorMessage");
+    const loadingState = document.getElementById("loadingState");
+    const themeToggle = document.getElementById("themeToggle");
+    const supportLink = document.getElementById("supportLink");
+
+    let selectedFile = null;
+    let originalUrl = null;
+    let resultUrl = null;
+
+    if (SUPPORT_LINK) {
+      supportLink.href = SUPPORT_LINK;
+    } else {
+      supportLink.addEventListener("click", (event) => {
+        event.preventDefault();
+        setError("add your Ko-fi or Buy Me a Coffee link in SUPPORT_LINK first :3");
+      });
+    }
+
+    function setError(message = "") {
+      errorMessage.textContent = message;
+    }
+
+    function revokeUrl(url) {
+      if (url) URL.revokeObjectURL(url);
+    }
+
+    function selectFile(file) {
+      setError();
+      if (!file) return;
+
+      if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+        setError("please choose a PNG, JPG, or WebP image :[");
+        return;
+      }
+
+      if (file.size > MAX_FILE_SIZE) {
+        setError("that image is over 10 MB—please pick a smaller one :[");
+        return;
+      }
+
+      selectedFile = file;
+      revokeUrl(originalUrl);
+      revokeUrl(resultUrl);
+      originalUrl = URL.createObjectURL(file);
+      resultUrl = null;
+
+      originalPreview.src = originalUrl;
+      resultPreview.hidden = true;
+      resultPreview.removeAttribute("src");
+      resultPlaceholder.hidden = false;
+      downloadButton.hidden = true;
+      workspace.classList.add("visible");
+      removeButton.disabled = false;
+    }
+
+    async function removeBackground() {
+      if (!selectedFile) return;
+
+      setError();
+      removeButton.disabled = true;
+      loadingState.classList.add("visible");
+
+      try {
+        const formData = new FormData();
+        formData.append("image", selectedFile, selectedFile.name);
+
+        const response = await fetch(API_ENDPOINT, {
+          method: "POST",
+          body: formData
+        });
+
+        if (!response.ok) {
+          let message = "the removy thingy had a little oopsie. please try again :[";
+
+          try {
+            const data = await response.json();
+            message = data.error || message;
+          } catch (_) {}
+
+          throw new Error(message);
+        }
+
+        const imageBlob = await response.blob();
+        if (!imageBlob.type.startsWith("image/")) {
+          throw new Error("the server did not return an image. please try again :[");
+        }
+
+        revokeUrl(resultUrl);
+        resultUrl = URL.createObjectURL(imageBlob);
+        resultPreview.src = resultUrl;
+        resultPreview.hidden = false;
+        resultPlaceholder.hidden = true;
+        downloadButton.href = resultUrl;
+        downloadButton.hidden = false;
+      } catch (error) {
+        setError(error.message || "something went wrong :[");
+      } finally {
+        loadingState.classList.remove("visible");
+        removeButton.disabled = false;
+      }
+    }
+
+    function resetApp() {
+      selectedFile = null;
+      fileInput.value = "";
+      revokeUrl(originalUrl);
+      revokeUrl(resultUrl);
+      originalUrl = null;
+      resultUrl = null;
+      originalPreview.removeAttribute("src");
+      resultPreview.removeAttribute("src");
+      resultPreview.hidden = true;
+      resultPlaceholder.hidden = false;
+      downloadButton.hidden = true;
+      workspace.classList.remove("visible");
+      setError();
+    }
+
+    uploadLink.addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", () => selectFile(fileInput.files[0]));
+    removeButton.addEventListener("click", removeBackground);
+    resetButton.addEventListener("click", resetApp);
+
+    ["dragenter", "dragover"].forEach((eventName) => {
+      dropZone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        dropZone.classList.add("dragover");
+      });
+    });
+
+    ["dragleave", "drop"].forEach((eventName) => {
+      dropZone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        dropZone.classList.remove("dragover");
+      });
+    });
+
+    dropZone.addEventListener("drop", (event) => selectFile(event.dataTransfer.files[0]));
+
+    const savedTheme = localStorage.getItem("removy-theme");
+    if (savedTheme === "dark") document.documentElement.dataset.theme = "dark";
+
+    function syncThemeText() {
+      themeToggle.textContent = document.documentElement.dataset.theme === "dark" ? "light mode :P" : "dark mode :3";
+    }
+
+    syncThemeText();
+
+    themeToggle.addEventListener("click", () => {
+      const dark = document.documentElement.dataset.theme !== "dark";
+      document.documentElement.dataset.theme = dark ? "dark" : "";
+      localStorage.setItem("removy-theme", dark ? "dark" : "light");
+      syncThemeText();
+    });
+  </script>
+</body>
+</html>
