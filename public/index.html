@@ -183,5 +183,9 @@
     function syncThemeText() { themeToggle.textContent=document.documentElement.dataset.theme === "dark" ? "light mode :P" : "dark mode :3"; }
     syncThemeText(); themeToggle.addEventListener("click",()=>{const dark=document.documentElement.dataset.theme !== "dark"; document.documentElement.dataset.theme=dark ? "dark" : ""; localStorage.setItem("removy-theme",dark ? "dark" : "light"); syncThemeText();});
   </script>
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
