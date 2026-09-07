@@ -1,3 +1,6 @@
+import { Redis } from "@upstash/redis";
+import { Ratelimit } from "@upstash/ratelimit";
+
 export const config = {
   api: {
     bodyParser: false
@@ -5,6 +8,14 @@ export const config = {
 };
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const GLOBAL_BETA_LIMIT = 80;
+
+const redis = Redis.fromEnv();
+const visitorLimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(2, "1 h"),
+  prefix: "removy-visitor"
+});
 
 function sendJson(res, status, payload) {
   res.setHeader("Content-Type", "application/json");
@@ -42,28 +53,19 @@ function getImageFromMultipart(body, contentType) {
 
   while (cursor < body.length) {
     const partStart = body.indexOf(boundary, cursor);
-
     if (partStart === -1) break;
 
     const headerStart = partStart + boundary.length;
-    const headerEnd = body.indexOf(Buffer.from("\\r\\n\\r\\n"), headerStart);
-
+    const headerEnd = body.indexOf(Buffer.from("\r\n\r\n"), headerStart);
     if (headerEnd === -1) break;
 
-    const headers = body
-      .subarray(headerStart, headerEnd)
-      .toString("utf8");
-
+    const headers = body.subarray(headerStart, headerEnd).toString("utf8");
     const nextBoundary = body.indexOf(boundary, headerEnd + 4);
-
     if (nextBoundary === -1) break;
 
     const partBodyEnd = nextBoundary - 2;
     const partBody = body.subarray(headerEnd + 4, partBodyEnd);
-
-    const isImageField =
-      /name="image"/i.test(headers) &&
-      /filename="/i.test(headers);
+    const isImageField = /name="image"/i.test(headers) && /filename="/i.test(headers);
 
     if (isImageField) {
       const mimeMatch = headers.match(/Content-Type:\s*([^\r\n]+)/i);
@@ -80,6 +82,17 @@ function getImageFromMultipart(body, contentType) {
   throw new Error("No image field was found");
 }
 
+function getClientIp(req) {
+  const forwardedFor = req.headers["x-forwarded-for"];
+
+  if (Array.isArray(forwardedFor)) return forwardedFor[0];
+  if (typeof forwardedFor === "string" && forwardedFor.length) {
+    return forwardedFor.split(",")[0].trim();
+  }
+
+  return "unknown";
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -92,7 +105,6 @@ export default async function handler(req, res) {
 
   if (!briaApiKey) {
     console.error("Missing BRIA_API_KEY environment variable.");
-
     return sendJson(res, 500, {
       error: "server setup oopsie: the Bria API key is missing :["
     });
@@ -107,6 +119,29 @@ export default async function handler(req, res) {
   }
 
   try {
+    const ip = getClientIp(req);
+    const visitorResult = await visitorLimit.limit(ip);
+
+    if (!visitorResult.success) {
+      const secondsUntilReset = Math.max(
+        1,
+        Math.ceil((visitorResult.reset - Date.now()) / 1000)
+      );
+
+      res.setHeader("Retry-After", String(secondsUntilReset));
+      return sendJson(res, 429, {
+        error: "u used both free removies for this hour :[ please try again later :3"
+      });
+    }
+
+    const totalUsed = Number((await redis.get("removy:successful-removals")) || 0);
+
+    if (totalUsed >= GLOBAL_BETA_LIMIT) {
+      return sendJson(res, 503, {
+        error: "the free removy budget is used up for now :[ thanks for helping test it :3"
+      });
+    }
+
     const body = await readRequestBody(req, MAX_FILE_SIZE);
     const { buffer, mimeType } = getImageFromMultipart(body, incomingType);
 
@@ -131,7 +166,7 @@ export default async function handler(req, res) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "api_token": briaApiKey
+          api_token: briaApiKey
         },
         body: JSON.stringify({
           image: base64Image,
@@ -143,12 +178,7 @@ export default async function handler(req, res) {
 
     if (!briaResponse.ok) {
       const details = await briaResponse.text();
-
-      console.error(
-        "Bria provider failed:",
-        briaResponse.status,
-        details.slice(0, 800)
-      );
+      console.error("Bria provider failed:", briaResponse.status, details.slice(0, 800));
 
       if (briaResponse.status === 401 || briaResponse.status === 403) {
         return sendJson(res, 502, {
@@ -184,7 +214,6 @@ export default async function handler(req, res) {
 
     if (!outputUrl) {
       console.error("Bria returned no image_url:", briaData);
-
       return sendJson(res, 502, {
         error: "Bria did not return a finished image :["
       });
@@ -194,7 +223,6 @@ export default async function handler(req, res) {
 
     if (!imageResponse.ok) {
       console.error("Could not download Bria result:", imageResponse.status);
-
       return sendJson(res, 502, {
         error: "the finished image could not be downloaded :["
       });
@@ -208,12 +236,15 @@ export default async function handler(req, res) {
       });
     }
 
+    const newUsedCount = await redis.incr("removy:successful-removals");
+
     res.setHeader("Content-Type", "image/png");
-    res.setHeader(
-      "Content-Disposition",
-      'inline; filename="no-background.png"'
-    );
+    res.setHeader("Content-Disposition", 'inline; filename="no-background.png"');
     res.setHeader("Cache-Control", "no-store, max-age=0");
+    res.setHeader(
+      "X-Removy-Calls-Left",
+      String(Math.max(0, GLOBAL_BETA_LIMIT - newUsedCount))
+    );
 
     return res.status(200).send(finalImage);
   } catch (error) {
