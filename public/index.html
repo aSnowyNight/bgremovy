@@ -520,6 +520,27 @@
 
     updateBudgetCounter(callsLeft);
 
+    async function loadLiveBudget() {
+  try {
+    const response = await fetch("/api/budget", {
+      cache: "no-store"
+    });
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+
+    if (Number.isFinite(data.callsLeft)) {
+      updateBudgetCounter(data.callsLeft);
+    }
+  } catch (_) {
+    // If the budget request fails, keep the initial number rather than breaking the site.
+  }
+}
+
+loadLiveBudget();
+setInterval(loadLiveBudget, 60000);
+
     if (SUPPORT_LINK) {
       supportLink.href = SUPPORT_LINK;
     } else {
