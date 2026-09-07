@@ -210,14 +210,29 @@ export default async function handler(req, res) {
     }
 
     const briaData = await briaResponse.json();
-    const outputUrl = briaData?.result?.image_url;
 
-    if (!outputUrl) {
-      console.error("Bria returned no image_url:", briaData);
-      return sendJson(res, 502, {
-        error: "Bria did not return a finished image :["
-      });
-    }
+console.log("Bria success response:", JSON.stringify(briaData));
+
+const rawOutputUrl =
+  briaData?.result?.image_url ||
+  briaData?.result_url ||
+  briaData?.image_url ||
+  briaData?.output_url;
+
+if (!rawOutputUrl) {
+  console.error("Bria returned no output URL:", briaData);
+
+  return sendJson(res, 502, {
+    error: "Bria did not return a finished image :["
+  });
+}
+
+const outputUrl = new URL(
+  rawOutputUrl,
+  "https://engine.prod.bria-api.com"
+).toString();
+    
+    const outputUrl = briaData?.result?.image_url;
 
     const imageResponse = await fetch(outputUrl);
 
