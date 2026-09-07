@@ -8,7 +8,7 @@ export const config = {
 };
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
-const GLOBAL_BETA_LIMIT = 80;
+const GLOBAL_BETA_LIMIT = 90;
 
 const redis = Redis.fromEnv();
 const visitorLimit = new Ratelimit({
