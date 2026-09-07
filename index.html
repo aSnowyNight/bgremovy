@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>background removy thingy :3</title>
+  <style>
+    :root { --bg:#fff8fc; --text:#ed86b5; --border:#ed86b5; --button:#ffe6f2; --button-hover:#ffd6e9; --muted:#9d9d9d; --checker-a:#ffddec; --checker-b:#fff8fc; }
+    :root[data-theme="dark"] { --bg:#141414; --text:#f7f7f7; --border:#f7f7f7; --button:#2b2b2b; --button-hover:#3a3a3a; --muted:#a4a4a4; --checker-a:#303030; --checker-b:#1f1f1f; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; padding:22px; overflow-x:hidden; background:var(--bg); color:var(--text); font-family:"Comic Sans MS","Comic Sans",cursive; transition:background .15s,color .15s; }
+    header { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; max-width:860px; margin:0 auto 40px; }
+    h1 { font-size:clamp(2rem,6vw,4rem); line-height:1; margin:10px 0 0; }
+    select,button { color:var(--text); background:var(--button); border:2px solid var(--border); border-radius:8px; font:inherit; cursor:pointer; }
+    select { padding:8px; } button { padding:10px 14px; } button:hover:not(:disabled) { background:var(--button-hover); transform:rotate(-1deg); } button:disabled { cursor:not-allowed; opacity:.55; }
+    #dvd-cat { position:fixed; z-index:2; width:clamp(55px,9vw,105px); height:auto; pointer-events:none; user-select:none; -webkit-user-drag:none; will-change:transform; }
+    main { position:relative; z-index:5; max-width:860px; margin:0 auto; }
+    #cat-no-go-zone { position:relative; z-index:4; padding:42px 28px; margin:-42px -28px; pointer-events:none; }
+    #cat-no-go-zone > * { pointer-events:auto; }
+    .box { border:3px dashed var(--border); border-radius:12px; padding:44px 20px; text-align:center; cursor:pointer; background:var(--bg); }
+    .box.dragging { background:var(--button); } .box p { margin:0 0 18px; font-size:1.25rem; }
+    #preview-area { display:none; margin-top:25px; text-align:center; }
+    #preview { max-width:100%; max-height:420px; border:2px solid var(--border); border-radius:8px; background-color:var(--checker-b); background-image:linear-gradient(45deg,var(--checker-a) 25%,transparent 25%),linear-gradient(-45deg,var(--checker-a) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,var(--checker-a) 75%),linear-gradient(-45deg,transparent 75%,var(--checker-a) 75%); background-size:24px 24px; background-position:0 0,0 12px,12px -12px,-12px 0; }
+    .actions { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:14px; }
+    #status { min-height:24px; margin:18px 0 0; text-align:center; }
+    #rotating-tip { color:var(--muted); min-height:28px; margin:12px auto 0; max-width:680px; text-align:center; font-size:.95rem; line-height:1.45; transition:opacity .28s ease,transform .28s ease; }
+    #rotating-tip.changing { opacity:0; transform:translateY(5px) rotate(-.35deg); }
+    #error-overlay { position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.28); font-family:Tahoma,Verdana,Arial,sans-serif; }
+    #error-overlay.open { display:flex; }
+    .win-error { width:min(430px,100%); border:2px solid #000080; box-shadow:7px 7px 0 rgba(0,0,0,.42); background:#c0c0c0; color:#000; border-radius:0; }
+    .win-titlebar { height:28px; padding:4px 5px 4px 7px; display:flex; align-items:center; justify-content:space-between; color:#fff; background:linear-gradient(90deg,#000080,#1084d0); font-weight:bold; font-size:14px; }
+    .win-close { display:grid; place-items:center; width:19px; height:19px; padding:0; border:2px outset #fff; border-radius:0; color:#000; background:#c0c0c0; font-family:Arial,sans-serif; font-size:15px; font-weight:bold; line-height:1; }
+    .win-close:hover { transform:none; background:#c0c0c0; }
+    .win-body { display:flex; gap:16px; padding:22px 18px 14px; align-items:flex-start; }.win-icon { font-family:Arial,sans-serif; font-size:38px; line-height:1; color:#ffcf00; text-shadow:1px 1px #000; }.win-message { font-size:15px; line-height:1.35; }.win-subtext { display:block; margin-top:9px; font-size:12px; }.win-buttons { display:flex; justify-content:center; gap:10px; padding:4px 14px 18px; }
+    .win-button { min-width:106px; padding:5px 13px; border:2px outset #fff; border-radius:0; color:#000; background:#c0c0c0; font-family:Tahoma,Verdana,Arial,sans-serif; font-size:13px; box-shadow:none; }.win-button:hover:not(:disabled) { background:#c0c0c0; transform:none; }.win-button:active { border-style:inset; }.win-button:focus { outline:1px dotted #000; outline-offset:-5px; }
+    @media (max-width:560px) { body { padding:14px; } header { margin-bottom:28px; } #cat-no-go-zone { padding:25px 8px; margin:-25px -8px; } }
+  </style>
+</head>
+<body>
+  <img id="dvd-cat" src="spinny-cat.gif" alt="" aria-hidden="true">
+  <header>
+    <h1>background removy thingy :3</h1>
+    <label><select id="theme" aria-label="Choose light or dark mode"><option value="light">light mode :P</option><option value="dark">dark mode :3</option></select></label>
+  </header>
+
+  <main>
+    <div id="cat-no-go-zone">
+      <div class="box" id="drop-zone" tabindex="0" role="button" aria-label="Choose an image">
+        <p>put image here :P</p>
+        <button id="choose-button" type="button">choose image :3</button>
+        <input id="file-input" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+      </div>
+      <div id="preview-area">
+        <img id="preview" alt="Your image preview">
+        <div class="actions"><button id="remove-button" type="button">remove background :P</button><button id="download-button" type="button" disabled>download result :3</button><button id="clear-button" type="button">nah, clear it :P</button></div>
+      </div>
+    </div>
+    <p id="status">upload an image :] </p>
+    <p id="rotating-tip" aria-live="polite">tip: a clear subject makes the removy thingy less likely to yeet important pixels :3</p>
+  </main>
+
+  <div id="error-overlay" role="dialog" aria-modal="true" aria-labelledby="error-title">
+    <div class="win-error">
+      <div class="win-titlebar"><span id="error-title">background removy thingy.exe</span><button class="win-close" id="error-close" type="button" aria-label="Close">×</button></div>
+      <div class="win-body"><div class="win-icon" aria-hidden="true">⚠</div><div class="win-message">uh oh file too big! maybe if u say please i can do it :3<span class="win-subtext" id="file-size-message"></span></div></div>
+      <div class="win-buttons"><button class="win-button" id="please-button" type="button">pweaseee</button><button class="win-button" id="no-button" type="button">hmph, no!</button></div>
+    </div>
+  </div>
+
+  <!-- Normal script first: it makes uploading work even if the AI library fails to load. -->
+  <script>
+    const HARD_LIMIT_BYTES = 15 * 1024 * 1024;
+    const PLEASE_LIMIT_BYTES = 16 * 1024 * 1024;
+    const ALLOWED_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
+    const theme = document.getElementById('theme');
+    const root = document.documentElement;
+    const input = document.getElementById('file-input');
+    const zone = document.getElementById('drop-zone');
+    const catNoGoZone = document.getElementById('cat-no-go-zone');
+    const cat = document.getElementById('dvd-cat');
+    const choose = document.getElementById('choose-button');
+    const previewArea = document.getElementById('preview-area');
+    const preview = document.getElementById('preview');
+    const removeButton = document.getElementById('remove-button');
+    const downloadButton = document.getElementById('download-button');
+    const clearButton = document.getElementById('clear-button');
+    const status = document.getElementById('status');
+    const rotatingTip = document.getElementById('rotating-tip');
+    const errorOverlay = document.getElementById('error-overlay');
+    const errorClose = document.getElementById('error-close');
+    const pleaseButton = document.getElementById('please-button');
+    const noButton = document.getElementById('no-button');
+    const fileSizeMessage = document.getElementById('file-size-message');
+
+    let selectedFile = null;
+    let pendingTooBigFile = null;
+    let currentUrl = null;
+    let outputBlob = null;
+    let removeBackgroundAI = null;
+
+    const savedTheme = localStorage.getItem('background-removy-theme');
+    const defaultTheme = savedTheme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    root.dataset.theme = defaultTheme;
+    theme.value = defaultTheme;
+    theme.addEventListener('change', () => { root.dataset.theme = theme.value; localStorage.setItem('background-removy-theme', theme.value); });
+
+    const tips = [
+      'tip: a clear subject makes the removy thingy less likely to yeet important pixels :3',
+      'tip: use a photo with good lighting. it is not 2012 Instagram, embrace the lamp :P',
+      'tip: busy backgrounds are the final boss. a plain wall is lowkey OP :3',
+      'tip: if there are 14 people in the photo, the computer may be confusion :P',
+      'tip: transparent things and fluffy hair are not exactly dank memes to process :3',
+      'tip: your image goes in, the background goes out. this is the way. much wow :P',
+      'tip: try a front-facing subject. side quests may result in missing elbows :3',
+      'tip: no pressure, but this cat has seen things. things from 2016 :P',
+      'tip: smaller files are faster. big images are a bit of a heckin chonker :3',
+      'tip: if it looks weird, try another photo. the algorithm is doing its best, probably :P',
+      'tip: keep the main subject away from the background if possible. personal space matters :3',
+      'tip: delete the background, not your hopes and dreams. stay hydrated :P'
+    ];
+    let tipIndex = 0;
+    setInterval(() => { rotatingTip.classList.add('changing'); setTimeout(() => { tipIndex = (tipIndex + 1) % tips.length; rotatingTip.textContent = tips[tipIndex]; rotatingTip.classList.remove('changing'); }, 280); }, 4800);
+
+    choose.addEventListener('click', event => { event.stopPropagation(); input.click(); });
+    zone.addEventListener('click', () => input.click());
+    zone.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); input.click(); } });
+    input.addEventListener('change', () => trySetImage(input.files[0]));
+    ['dragenter', 'dragover'].forEach(name => zone.addEventListener(name, event => { event.preventDefault(); zone.classList.add('dragging'); }));
+    ['dragleave', 'drop'].forEach(name => zone.addEventListener(name, event => { event.preventDefault(); zone.classList.remove('dragging'); }));
+    zone.addEventListener('drop', event => trySetImage(event.dataTransfer.files[0]));
+
+    function formatMB(bytes) { return `${(bytes / 1024 / 1024).toFixed(2)} MB`; }
+    function trySetImage(file) {
+      if (!file) return;
+      if (!ALLOWED_TYPES.has(file.type)) { status.textContent = 'pls use a PNG, JPG, or WEBP :P'; input.value = ''; return; }
+      if (file.size > HARD_LIMIT_BYTES) {
+        pendingTooBigFile = file;
+        fileSizeMessage.textContent = `your file is ${formatMB(file.size)}. normal limit: 15 MB.`;
+        pleaseButton.disabled = file.size > PLEASE_LIMIT_BYTES;
+        errorOverlay.classList.add('open');
+        errorClose.focus();
+        input.value = '';
+        return;
+      }
+      acceptImage(file);
+    }
+    function acceptImage(file) {
+      selectedFile = file;
+      outputBlob = null;
+      showBlob(file);
+      downloadButton.disabled = true;
+      previewArea.style.display = 'block';
+      status.textContent = `got it: ${file.name} (${formatMB(file.size)}) :3`;
+    }
+    function closeError() { errorOverlay.classList.remove('open'); pendingTooBigFile = null; }
+    errorClose.addEventListener('click', closeError);
+    noButton.addEventListener('click', () => { closeError(); status.textContent = 'ok then. choose a smaller file when u are ready :P'; });
+    pleaseButton.addEventListener('click', () => {
+      if (!pendingTooBigFile) return;
+      const file = pendingTooBigFile;
+      if (file.size > PLEASE_LIMIT_BYTES) { closeError(); status.textContent = 'even pweaseee cannot defeat this mega chonker. max bonus limit is 16 MB :['; return; }
+      closeError(); acceptImage(file); status.textContent = `fine... pweaseee accepted. ${formatMB(file.size)} is allowed this one time :3`;
+    });
+    errorOverlay.addEventListener('click', event => { if (event.target === errorOverlay) closeError(); });
+    window.addEventListener('keydown', event => { if (event.key === 'Escape' && errorOverlay.classList.contains('open')) closeError(); });
+    function showBlob(blob) { if (currentUrl) URL.revokeObjectURL(currentUrl); currentUrl = URL.createObjectURL(blob); preview.src = currentUrl; }
+
+    removeButton.addEventListener('click', async () => {
+      if (!selectedFile) { status.textContent = 'u gotta choose an image first :P'; return; }
+      if (!removeBackgroundAI) { status.textContent = 'the removy AI did not load. refresh the page and check your internet :['; return; }
+      removeButton.disabled = true;
+      downloadButton.disabled = true;
+      status.textContent = 'loading the removy AI brain... first run can take a minute :P';
+      try {
+        outputBlob = await removeBackgroundAI(selectedFile, {
+          device: 'cpu', model: 'isnet_quint8',
+          output: { format: 'image/png', quality: 0.95, type: 'foreground' },
+          progress: (key, current, total) => { if (total > 0) status.textContent = `loading ${key}: ${Math.round((current / total) * 100)}% :3`; }
+        });
+        showBlob(outputBlob);
+        downloadButton.disabled = false;
+        status.textContent = 'done!! background has been removied :3';
+      } catch (error) {
+        console.error(error);
+        status.textContent = 'the removy thingy had a skill issue. try Chrome/Edge, a smaller image, or refresh :P';
+      } finally { removeButton.disabled = false; }
+    });
+
+    downloadButton.addEventListener('click', () => {
+      if (!outputBlob) return;
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(outputBlob);
+      a.download = `${selectedFile.name.replace(/\.[^.]+$/, '')}-removied.png`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+    clearButton.addEventListener('click', () => {
+      selectedFile = null; outputBlob = null; input.value = '';
+      if (currentUrl) URL.revokeObjectURL(currentUrl);
+      currentUrl = null; preview.removeAttribute('src'); previewArea.style.display = 'none'; downloadButton.disabled = true; status.textContent = 'upload an image :]';
+    });
+
+    let catX = 0, catY = 0, velocityX = 2.15, velocityY = 1.65, catWidth = 90, catHeight = 90, lastFrameTime = 0;
+    function catSize() { const rect = cat.getBoundingClientRect(); catWidth = rect.width || 90; catHeight = rect.height || 90; }
+    function resetCatPosition() { catSize(); catX = Math.max(8, window.innerWidth - catWidth - 20); catY = 95; cat.style.transform = `translate(${catX}px, ${catY}px)`; }
+    function overlaps(a,b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
+    function moveCat(time) {
+      const dt = lastFrameTime ? Math.min((time - lastFrameTime) / 16.67, 2.5) : 1; lastFrameTime = time; catSize(); catX += velocityX * dt; catY += velocityY * dt;
+      const maxX = Math.max(0, window.innerWidth - catWidth), maxY = Math.max(0, window.innerHeight - catHeight);
+      if (catX <= 0) { catX = 0; velocityX = Math.abs(velocityX); } if (catX >= maxX) { catX = maxX; velocityX = -Math.abs(velocityX); } if (catY <= 0) { catY = 0; velocityY = Math.abs(velocityY); } if (catY >= maxY) { catY = maxY; velocityY = -Math.abs(velocityY); }
+      const noGo = catNoGoZone.getBoundingClientRect(), catRect = { left:catX, top:catY, right:catX + catWidth, bottom:catY + catHeight };
+      if (overlaps(catRect, noGo)) {
+        const pushX = (catRect.right - noGo.left) < (noGo.right - catRect.left) ? noGo.left - catWidth : noGo.right;
+        const pushY = (catRect.bottom - noGo.top) < (noGo.bottom - catRect.top) ? noGo.top - catHeight : noGo.bottom;
+        if (Math.abs(catX - pushX) < Math.abs(catY - pushY)) { catX = pushX; velocityX *= -1; } else { catY = pushY; velocityY *= -1; }
+      }
+      cat.style.transform = `translate(${catX}px, ${catY}px)`; requestAnimationFrame(moveCat);
+    }
+    cat.addEventListener('load', resetCatPosition); cat.addEventListener('error', () => cat.remove());
+    window.addEventListener('resize', () => { catSize(); catX = Math.min(Math.max(0,catX),Math.max(0,window.innerWidth-catWidth)); catY = Math.min(Math.max(0,catY),Math.max(0,window.innerHeight-catHeight)); });
+    resetCatPosition(); requestAnimationFrame(moveCat);
+
+    window.setRemovyAI = fn => { removeBackgroundAI = fn; };
+    window.setRemovyAIError = () => { console.warn('IMG.LY failed to load. Upload is still available.'); };
+  </script>
+
+  <!-- The AI import is isolated, so a CDN/import failure cannot stop the upload controls above. -->
+  <script type="module">
+    try {
+      const module = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm');
+      window.setRemovyAI(module.default);
+    } catch (error) {
+      console.error('Could not load IMG.LY', error);
+      window.setRemovyAIError();
+    }
+  </script>
+</body>
+</html>
