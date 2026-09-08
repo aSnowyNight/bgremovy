@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Cute, free little tools for editing and fixing up images." />
+  <title>little image thingies :3</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap');
+    :root { --bg:#fffaff; --surface:#fff8fd; --surface-2:#fff3fa; --pink:#ff74ae; --pink-dark:#ed5b9a; --pink-soft:#ffd7e8; --ink:#6f6870; --muted:#9a9299; --border:#ff77b0; --shadow:rgba(255,116,174,.18); --card-shadow:0 10px 28px rgba(255,116,174,.13); }
+    [data-theme="dark"] { --bg:#211923; --surface:#2c202e; --surface-2:#352639; --pink:#ff8ec0; --pink-dark:#ffaad0; --pink-soft:#5e334e; --ink:#f8eaf2; --muted:#c9b8c3; --border:#ff86ba; --shadow:rgba(0,0,0,.30); --card-shadow:0 10px 28px rgba(0,0,0,.25); }
+    [data-theme="creamsicle"] { --bg:#fffaf3; --surface:#fff; --surface-2:#fff1df; --pink:#f57a25; --pink-dark:#c85212; --pink-soft:#ffd5ad; --ink:#2f2925; --muted:#766b64; --border:#f6a45f; --shadow:rgba(201,82,18,.16); --card-shadow:0 12px 30px rgba(201,82,18,.12); }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { min-height:100vh; margin:0; color:var(--ink); background:radial-gradient(circle at 10% 5%,rgba(255,207,229,.36),transparent 23rem),radial-gradient(circle at 90% 23%,rgba(255,222,239,.40),transparent 20rem),var(--bg); font-family:"Nunito",system-ui,sans-serif; transition:background .2s ease,color .2s ease; }
+    [data-theme="dark"] body { background:radial-gradient(circle at 10% 5%,rgba(125,56,96,.25),transparent 23rem),radial-gradient(circle at 90% 23%,rgba(105,53,93,.24),transparent 20rem),var(--bg); }
+    [data-theme="creamsicle"] body { background:radial-gradient(circle at 10% 5%,rgba(255,203,150,.35),transparent 23rem),radial-gradient(circle at 90% 23%,rgba(255,230,199,.58),transparent 20rem),var(--bg); }
+    button,a { -webkit-tap-highlight-color:transparent; }
+    .page { width:min(100% - 32px,960px); margin:24px auto 58px; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .brand { color:var(--pink); font:700 clamp(1.65rem,4vw,2.2rem)/.9 "Gaegu","Comic Sans MS",cursive; text-decoration:none; letter-spacing:.01em; }
+    .topbar-actions { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:8px; }
+    .theme-toggle,.discord-link,.support-button,.hero-button { border:1.5px solid var(--border); border-radius:8px; color:var(--pink-dark); background:transparent; font:700 1rem "Gaegu","Comic Sans MS",cursive; cursor:pointer; text-decoration:none; transition:transform .15s ease,background .15s ease,color .15s ease,box-shadow .15s ease; }
+    .theme-picker { position:relative; }
+    .theme-toggle { min-height:34px; padding:6px 9px; white-space:nowrap; font-size:.95rem; }
+    .theme-menu { position:absolute; z-index:10; top:calc(100% + 7px); right:0; width:142px; padding:6px; border:1.5px solid var(--pink-soft); border-radius:11px; background:var(--surface); box-shadow:0 10px 25px var(--shadow); }
+    .theme-option { display:block; width:100%; border:0; border-radius:7px; padding:7px 8px; color:var(--pink-dark); background:transparent; text-align:left; font:700 1rem "Gaegu","Comic Sans MS",cursive; cursor:pointer; }
+    .theme-option:hover,.theme-option[aria-current="true"] { background:var(--pink-soft); }
+
+    /* The icon uses a balanced 24x24 artwork and an exact square mobile button. */
+    .discord-link { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:34px; padding:6px 10px 5px; font:700 .95rem/1 "Gaegu","Comic Sans MS",cursive; line-height:1; white-space:nowrap; }
+    .discord-icon { width:18px; height:18px; display:block; flex:0 0 18px; fill:currentColor; transform:none; }
+    .theme-toggle:hover,.discord-link:hover { background:var(--pink-soft); transform:translateY(-1px); }
+    .theme-toggle:focus-visible,.discord-link:focus-visible,.tool-card:focus-visible,.hero-button:focus-visible,.support-button:focus-visible,.theme-option:focus-visible { outline:3px solid var(--pink-soft); outline-offset:3px; }
+    .hero { position:relative; overflow:hidden; margin-top:40px; padding:clamp(28px,6vw,54px); border:1.5px solid var(--pink-soft); border-radius:22px; background:var(--surface); box-shadow:var(--card-shadow); }
+    .hero::after { content:"✦  ♡  ✦"; position:absolute; right:24px; bottom:17px; color:var(--pink-soft); font:700 2rem "Gaegu",cursive; letter-spacing:.3em; pointer-events:none; }
+    .eyebrow { width:fit-content; margin:0 0 10px; padding:5px 10px; border:1px solid var(--pink-soft); border-radius:999px; color:var(--pink-dark); background:var(--surface-2); font:700 .95rem "Gaegu","Comic Sans MS",cursive; }
+    h1 { max-width:650px; margin:0; color:var(--pink); font:700 clamp(3.3rem,8vw,5.6rem)/.78 "Gaegu","Comic Sans MS",cursive; letter-spacing:.01em; text-wrap:balance; }
+    .hero-copy { max-width:600px; margin:18px 0 0; color:var(--muted); font-size:clamp(1rem,2vw,1.08rem); line-height:1.55; }
+    .hero-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:21px; }
+    .hero-button { display:inline-flex; align-items:center; justify-content:center; min-height:39px; padding:8px 14px; }
+    .hero-button.primary,.support-button { border-color:var(--pink); background:var(--pink); color:#fff; box-shadow:0 5px 13px var(--shadow); }
+    .hero-button:hover,.support-button:hover { background:var(--pink-dark); color:#fff; transform:translateY(-1px); }
+    .section { margin-top:40px; }
+    .section-heading { display:flex; align-items:end; justify-content:space-between; gap:16px; margin-bottom:13px; }
+    h2 { margin:0; color:var(--pink-dark); font:700 clamp(2rem,5vw,2.7rem)/.9 "Gaegu","Comic Sans MS",cursive; }
+    .section-note { margin:0; color:var(--muted); text-align:right; font:400 .98rem "Gaegu","Comic Sans MS",cursive; }
+    .tool-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+    .tool-card { position:relative; min-height:200px; display:flex; flex-direction:column; align-items:flex-start; padding:18px; overflow:hidden; border:1.5px solid var(--pink-soft); border-radius:16px; color:var(--ink); background:var(--surface); box-shadow:var(--card-shadow); text-decoration:none; transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease; }
+    .tool-card:hover { border-color:var(--border); box-shadow:0 14px 31px var(--shadow); transform:translateY(-4px); }
+    .tool-card.coming-soon { cursor:default; opacity:.86; }
+    .tool-card.coming-soon:hover { border-color:var(--pink-soft); box-shadow:var(--card-shadow); transform:none; }
+    .tool-icon { width:48px; height:48px; display:grid; place-items:center; margin-bottom:12px; border:1px solid var(--pink-soft); border-radius:14px; color:var(--pink-dark); background:var(--surface-2); font:700 2rem/1 "Gaegu","Comic Sans MS",cursive; }
+    .tool-card h3 { margin:0; color:var(--pink-dark); font:700 1.45rem/1 "Gaegu","Comic Sans MS",cursive; }
+    .tool-card p { margin:7px 0 0; color:var(--muted); font-size:.88rem; line-height:1.42; }
+    .tool-tag { margin-top:auto; padding-top:14px; color:var(--pink-dark); font:700 .92rem "Gaegu","Comic Sans MS",cursive; }
+    .tool-tag.ai { color:#b66f00; }
+    [data-theme="dark"] .tool-tag.ai { color:#ffc36a; }
+    [data-theme="creamsicle"] .tool-tag.ai { color:#a84b0c; }
+    .info-grid { display:grid; grid-template-columns:1.2fr .8fr; gap:14px; }
+    .info-card { padding:20px; border:1.5px solid var(--pink-soft); border-radius:16px; background:var(--surface); box-shadow:var(--card-shadow); }
+    .info-card h3 { margin:0 0 7px; color:var(--pink-dark); font:700 1.45rem/1 "Gaegu","Comic Sans MS",cursive; }
+    .info-card p { margin:0; color:var(--muted); font-size:.9rem; line-height:1.5; }
+    .support-button { display:inline-flex; align-items:center; justify-content:center; min-height:38px; margin-top:13px; padding:8px 13px; }
+    footer { margin-top:38px; color:var(--muted); text-align:center; font:400 .92rem/1.45 "Gaegu","Comic Sans MS",cursive; }
+    footer a { color:var(--pink-dark); }
+    @media (max-width:760px) { .tool-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .info-grid { grid-template-columns:1fr; } }
+    @media (max-width:560px) {
+      .page { width:min(100% - 24px,960px); margin-top:18px; }
+      .topbar { align-items:flex-start; gap:10px; }
+      .brand { max-width:155px; }
+      .topbar-actions { gap:5px; }
+      .theme-toggle { font-size:.85rem; }
+      .discord-link { display:grid; place-items:center; width:34px; height:34px; min-height:34px; padding:0; }
+      .discord-link span { display:none; }
+      .discord-icon { width:17px; height:17px; flex:none; transform:none; }
+      .hero { margin-top:28px; border-radius:18px; }
+      .hero::after { right:13px; bottom:12px; font-size:1.5rem; }
+      .tool-grid { grid-template-columns:1fr; }
+      .tool-card { min-height:170px; }
+      .section-heading { align-items:flex-start; flex-direction:column; gap:3px; }
+      .section-note { text-align:left; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="little image thingies home">little image<br>thingies :3</a>
+      <nav class="topbar-actions" aria-label="Site links">
+        <a class="discord-link" href="https://discord.gg/GNhbQbG5cB" target="_blank" rel="noopener noreferrer" aria-label="Join the Discord community" title="join the discord :3">
+          <svg class="discord-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.54 4.64A16.4 16.4 0 0 0 15.49 3.4l-.5 1.02a15.2 15.2 0 0 0-5.98 0l-.5-1.02a16.5 16.5 0 0 0-4.05 1.24C1.9 8.45 1.2 12.18 1.54 15.86a16.3 16.3 0 0 0 4.97 2.5l1.21-1.63a9.45 9.45 0 0 1-1.9-.92l.46-.36c3.67 1.7 7.66 1.7 11.28 0l.46.36c-.61.36-1.25.67-1.91.92l1.21 1.63a16.2 16.2 0 0 0 4.97-2.5c.41-4.27-.7-7.96-2.76-11.22ZM8.68 13.6c-1.1 0-2-1.01-2-2.26s.88-2.26 2-2.26c1.13 0 2.02 1.02 2 2.26 0 1.25-.88 2.26-2 2.26Zm6.64 0c-1.1 0-2-1.01-2-2.26s.88-2.26 2-2.26c1.13 0 2.02 1.02 2 2.26 0 1.25-.87 2.26-2 2.26Z"/></svg>
+          <span>discord :3</span>
+        </a>
+        <div class="theme-picker" aria-label="Choose a color theme">
+          <button class="theme-toggle" id="themeToggle" type="button" aria-expanded="false" aria-controls="themeMenu">themes :3</button>
+          <div class="theme-menu" id="themeMenu" hidden><button type="button" class="theme-option" data-theme-choice="light">light mode :P</button><button type="button" class="theme-option" data-theme-choice="dark">dark mode :3</button><button type="button" class="theme-option" data-theme-choice="creamsicle">creamsicle :D</button></div>
+        </div>
+      </nav>
+    </header>
+    <section class="hero" aria-labelledby="heroTitle"><p class="eyebrow">free lil tools for ur images :]</p><h1 id="heroTitle">little image<br>thingies :3</h1><p class="hero-copy">a growing pile of cute, simple tools for fixing up images—background removal, resizing, profile pictures, file conversions, and more :D</p><div class="hero-actions"><a class="hero-button primary" href="tools/remove-background.html">remove a background :3</a><a class="hero-button" href="#tools">see all tool thingies</a></div></section>
+    <section class="section" id="tools" aria-labelledby="toolsTitle"><div class="section-heading"><h2 id="toolsTitle">tool thingies :3</h2><p class="section-note">more little things are on the way</p></div><div class="tool-grid"><a class="tool-card" href="tools/remove-background.html"><span class="tool-icon" aria-hidden="true">✂</span><h3>remove background</h3><p>turn a photo into a transparent PNG with one little click.</p><span class="tool-tag ai">☁ uses limited shared AI credits</span></a><a class="tool-card" href="tools/change-background.html"><span class="tool-icon" aria-hidden="true">✦</span><h3>change background</h3><p>put a color, gradient, or another image behind your cutout.</p><span class="tool-tag">♡ no extra AI call after cutout</span></a><a class="tool-card" href="tools/resize-crop.html"><span class="tool-icon" aria-hidden="true">↗</span><h3>resize + crop</h3><p>make images fit profile pics, banners, posts, and more.</p><span class="tool-tag">♡ runs in your browser</span></a><a class="tool-card" href="tools/compress.html"><span class="tool-icon" aria-hidden="true">⌁</span><h3>compress image</h3><p>make a file smaller without making it look too crunchy.</p><span class="tool-tag">♡ runs in your browser</span></a><a class="tool-card" href="tools/convert.html"><span class="tool-icon" aria-hidden="true">⇄</span><h3>convert image</h3><p>turn JPGs, PNGs, and WebPs into each other.</p><span class="tool-tag">♡ runs in your browser</span></a><a class="tool-card" href="tools/pfp-maker.html"><span class="tool-icon" aria-hidden="true">♡</span><h3>make a pfp</h3><p>crop, frame, and make a cute profile picture for anywhere.</p><span class="tool-tag">♡ runs in your browser</span></a><a class="tool-card" href="tools/qr-maker.html"><span class="tool-icon" aria-hidden="true">▦</span><h3>QR maker</h3><p>make a QR code for a link, Discord invite, or little message.</p><span class="tool-tag">♡ runs in your browser</span></a><div class="tool-card coming-soon" aria-label="More tools coming soon"><span class="tool-icon" aria-hidden="true">?</span><h3>more soon :]</h3><p>palette pickers, metadata cleaning, favicon makers, and other tiny useful thingies.</p><span class="tool-tag">♡ join Discord to suggest stuff</span></div></div></section>
+    <section class="section" aria-labelledby="aboutTitle"><div class="info-grid"><article class="info-card"><h3 id="aboutTitle">a tiny heads up :]</h3><p>Some tools use limited shared AI processing, so results can vary and busy times may have limits. The browser-only tools stay free and do not use the shared AI budget.</p></article><article class="info-card"><h3>keep it alive? ♡</h3><p>Future support may help pay for API credits, hosting, improvements, and more useful tool thingies.</p><a class="support-button" href="#" id="supportLink">support coming soon :3</a></article></div></section>
+    <footer>made with little pixels and a lot of :3 &nbsp;•&nbsp; <a href="https://discord.gg/GNhbQbG5cB" target="_blank" rel="noopener noreferrer">join the Discord</a></footer>
+  </main>
+  <script>
+    const themeToggle=document.getElementById("themeToggle"),themeMenu=document.getElementById("themeMenu"),themeOptions=document.querySelectorAll("[data-theme-choice]"),supportLink=document.getElementById("supportLink");
+    function applyTheme(theme){document.documentElement.dataset.theme=theme==="light"?"":theme;localStorage.setItem("removy-theme",theme);themeToggle.textContent=theme==="light"?"light mode :P":theme==="dark"?"dark mode :3":"creamsicle :D";themeOptions.forEach(option=>option.setAttribute("aria-current",String(option.dataset.themeChoice===theme)));}
+    const savedTheme=localStorage.getItem("removy-theme")||"light";applyTheme(["light","dark","creamsicle"].includes(savedTheme)?savedTheme:"light");
+    themeToggle.addEventListener("click",()=>{const isOpen=!themeMenu.hidden;themeMenu.hidden=isOpen;themeToggle.setAttribute("aria-expanded",String(!isOpen));});
+    themeOptions.forEach(option=>option.addEventListener("click",()=>{applyTheme(option.dataset.themeChoice);themeMenu.hidden=true;themeToggle.setAttribute("aria-expanded","false");}));
+    document.addEventListener("click",event=>{if(!event.target.closest(".theme-picker")){themeMenu.hidden=true;themeToggle.setAttribute("aria-expanded","false");}});
+    supportLink.addEventListener("click",event=>{event.preventDefault();alert("support is not set up yet :[ but tysm for wanting to help keep the little tools alive ♡");});
+  </script>
+</body>
+</html>
