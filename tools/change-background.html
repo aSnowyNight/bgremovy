@@ -70,8 +70,13 @@
     .info-card p { margin:0; color:var(--muted); font-size:.86rem; line-height:1.48; }
     footer { margin-top:36px; color:var(--muted); text-align:center; font:400 .92rem/1.45 "Gaegu","Comic Sans MS",cursive; }
     footer a { color:var(--pink-dark); }
+    [data-site-mode="professional"] .brand,[data-site-mode="professional"] h1,[data-site-mode="professional"] h2,[data-site-mode="professional"] .eyebrow,[data-site-mode="professional"] .free-badge,[data-site-mode="professional"] .back-link,[data-site-mode="professional"] .upload-card p,[data-site-mode="professional"] .choose-button,[data-site-mode="professional"] .upload-link,[data-site-mode="professional"] .tip,[data-site-mode="professional"] .control-label,[data-site-mode="professional"] .image-bg-label,[data-site-mode="professional"] .range-value,[data-site-mode="professional"] .small-help,[data-site-mode="professional"] .control-button,[data-site-mode="professional"] .download-button,[data-site-mode="professional"] .reset-button,[data-site-mode="professional"] footer { font-family:"Nunito",system-ui,sans-serif; }
+    [data-site-mode="professional"] .brand { font-size:clamp(1.15rem,3vw,1.5rem); line-height:1; letter-spacing:-.02em; }
+    [data-site-mode="professional"] h1 { font-weight:800; line-height:.98; letter-spacing:-.045em; }
+    [data-site-mode="professional"] h2 { font-weight:800; letter-spacing:-.025em; }
+    [data-site-mode="professional"] .eyebrow,[data-site-mode="professional"] .free-badge,[data-site-mode="professional"] .back-link,[data-site-mode="professional"] .choose-button,[data-site-mode="professional"] .upload-link,[data-site-mode="professional"] .tip,[data-site-mode="professional"] .control-label,[data-site-mode="professional"] .image-bg-label,[data-site-mode="professional"] .range-value,[data-site-mode="professional"] .small-help,[data-site-mode="professional"] .control-button,[data-site-mode="professional"] .download-button,[data-site-mode="professional"] .reset-button,[data-site-mode="professional"] footer { font-weight:700; }
     @media (max-width:760px) { .editor { grid-template-columns:1fr; } .canvas-wrap { min-height:290px; } }
-    @media (max-width:620px) { .page { width:min(100% - 24px,960px); margin-top:18px; } .topbar { align-items:flex-start; gap:10px; } .brand { max-width:155px; } .topbar-actions { gap:5px; } .discord-link { display:grid; place-items:center; width:34px; height:34px; min-height:34px; padding:0; } .discord-link span { display:none; } .discord-icon { width:17px; height:17px; flex:none; } .hero { padding:25px 20px; } .canvas-wrap { min-height:235px; padding:8px; } .info-grid { grid-template-columns:1fr; } }
+    @media (max-width:620px) { .page { width:min(100% - 24px,960px); margin-top:18px; } .topbar { align-items:flex-start; gap:10px; } .brand { max-width:155px; } .topbar-actions { gap:5px; } .site-mode-toggle { font-size:.85rem; } .discord-link { display:grid; place-items:center; width:34px; height:34px; min-height:34px; padding:0; } .discord-link span { display:none; } .discord-icon { width:17px; height:17px; flex:none; } .hero { padding:25px 20px; } .canvas-wrap { min-height:235px; padding:8px; } .info-grid { grid-template-columns:1fr; } }
   </style>
 </head>
 <body>
@@ -80,9 +85,10 @@
       <a class="brand" href="../index.html" aria-label="little image thingies home">little image<br>thingies :3</a>
       <nav class="topbar-actions" aria-label="Site links">
         <a class="discord-link" href="https://discord.gg/GNhbQbG5cB" target="_blank" rel="noopener noreferrer" aria-label="Join the Discord community" title="join the discord :3">
-          <svg class="discord-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.54 4.64A16.4 16.4 0 0 0 15.49 3.4l-.5 1.02a15.2 15.2 0 0 0-5.98 0l-.5-1.02a16.5 16.5 0 0 0-4.05 1.24C1.9 8.45 1.2 12.18 1.54 15.86a16.3 16.3 0 0 0 4.97 2.5l1.21-1.63a9.45 9.45 0 0 1-1.9-.92l.46-.36c3.67 1.7 7.66 1.7 11.28 0l.46.36c-.61.36-1.25.67-1.91.92l1.21 1.63a16.2 16.2 0 0 0 4.97-2.5c.41-4.27-.7-7.96-2.76-11.22ZM8.68 13.6c-1.1 0-2-1.01-2-2.26s.88-2.26 2-2.26c1.13 0 2.02 1.02 2 2.26 0 1.25-.88 2.26-2 2.26Zm6.64 0c-1.1 0-2-1.01-2-2-2.26s.88-2.26 2-2.26c1.13 0 2.02 1.02 2 2.26 0 1.25-.87 2.26-2 2.26Z"/></svg>
+          <svg class="discord-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.54 4.64A16.4 16.4 0 0 0 15.49 3.4l-.5 1.02a15.2 15.2 0 0 0-5.98 0l-.5-1.02a16.5 16.5 0 0 0-4.05 1.24C1.9 8.45 1.2 12.18 1.54 15.86a16.3 16.3 0 0 0 4.97 2.5l1.21-1.63a9.45 9.45 0 0 1-1.9-.92l.46-.36c3.67 1.7 7.66 1.7 11.28 0l.46.36c-.61.36-1.25.67-1.91.92l1.21 1.63a16.2 16.2 0 0 0 4.97-2.5c.41-4.27-.7-7.96-2.76-11.22ZM8.68 13.6c-1.1 0-2-1.01-2-2.26s.88-2.26 2-2.26c1.13 0 2.02 1.02 2 2.26 0 1.25-.88 2.26-2 2.26Zm6.64 0c-1.1 0-2-1.01-2-2.26s.88-2.26 2-2.26c1.13 0 2.02 1.02 2 2.26 0 1.25-.87 2.26-2 2.26Z"/></svg>
           <span>discord :3</span>
         </a>
+        <button class="site-mode-toggle" data-site-mode-toggle type="button" aria-pressed="false" aria-label="Switch to professional mode" title="Switch to professional mode">professional mode</button>
         <div class="theme-picker" aria-label="Choose a color theme">
           <button class="theme-toggle" data-theme-toggle type="button" aria-expanded="false">themes :3</button>
           <div class="theme-menu" data-theme-menu hidden>
@@ -95,40 +101,38 @@
       </nav>
     </header>
 
-    <a class="back-link" href="../index.html">← all tool thingies</a>
+    <a class="back-link" href="../index.html" data-copy="change-back">← all tool thingies</a>
 
     <section class="hero" aria-labelledby="pageTitle">
-      <p class="eyebrow">little image thingies • browser tool</p>
-      <h1 id="pageTitle">change background :3</h1>
-      <p class="hero-copy">put a color, gradient, or another image behind a transparent PNG. everything happens right in your browser—quick, private, and free :D</p>
-      <span class="free-badge">♡ browser-side • no upload needed</span>
+      <p class="eyebrow" data-copy="change-eyebrow">little image thingies • browser tool</p>
+      <h1 id="pageTitle" data-copy="change-title">change background :3</h1>
+      <p class="hero-copy" data-copy="change-description">put a color, gradient, or another image behind a transparent PNG. everything happens right in your browser—quick, private, and free :D</p>
+      <span class="free-badge" data-copy="change-badge">♡ browser-side • no upload needed</span>
     </section>
 
     <label class="upload-card" id="dropZone" for="foregroundInput">
       <div>
         <span class="upload-icon" aria-hidden="true">↑</span>
-        <p>put transparent PNG here :P</p>
-        <span class="choose-button">choose cutout image :3</span>
+        <p data-copy="change-upload-title">put transparent PNG here :P</p>
+        <span class="choose-button" data-copy="change-upload-button">choose cutout image :3</span>
       </div>
     </label>
     <input id="foregroundInput" type="file" accept="image/png,image/webp" />
-    <button class="upload-link" id="uploadLink" type="button">or upload a transparent PNG :]</button>
-    <p class="tip">this works best with a PNG that already has its background removed :3</p>
+    <button class="upload-link" id="uploadLink" type="button" data-copy="change-upload-link">or upload a transparent PNG :]</button>
+    <p class="tip" data-copy="change-tip">this works best with a PNG that already has its background removed :3</p>
     <p class="error" id="errorMessage" role="alert"></p>
 
     <section class="editor" id="editor" aria-label="Background editor">
       <article class="preview-card">
-        <h2>your new background :D</h2>
-        <div class="canvas-wrap">
-          <canvas id="previewCanvas" width="1200" height="1200" aria-label="Background replacement preview"></canvas>
-        </div>
+        <h2 data-copy="change-preview-title">your new background :D</h2>
+        <div class="canvas-wrap"><canvas id="previewCanvas" width="1200" height="1200" aria-label="Background replacement preview"></canvas></div>
       </article>
 
       <aside class="controls-card">
-        <h2>make it pretty :3</h2>
+        <h2 data-copy="change-controls-title">make it pretty :3</h2>
         <div class="controls-body">
           <div class="control-group">
-            <span class="control-label">background presets</span>
+            <span class="control-label" data-copy="change-presets">background presets</span>
             <div class="preset-grid">
               <button class="preset white active" data-preset="white" type="button">white</button>
               <button class="preset black" data-preset="black" type="button">black</button>
@@ -140,68 +144,49 @@
           </div>
 
           <div class="control-group">
-            <label class="control-label" for="colorInput">or pick a color</label>
-            <div class="color-row">
-              <input class="color-input" id="colorInput" type="color" value="#ffffff" />
-              <input class="color-value" id="colorValue" type="text" value="#ffffff" maxlength="7" />
-            </div>
+            <label class="control-label" for="colorInput" data-copy="change-color">or pick a color</label>
+            <div class="color-row"><input class="color-input" id="colorInput" type="color" value="#ffffff" /><input class="color-value" id="colorValue" type="text" value="#ffffff" maxlength="7" /></div>
           </div>
 
           <div class="control-group">
-            <span class="control-label">use an image behind it</span>
-            <label class="image-bg-label" for="backgroundInput">upload background image :]</label>
+            <span class="control-label" data-copy="change-background-image">use an image behind it</span>
+            <label class="image-bg-label" for="backgroundInput" data-copy="change-background-upload">upload background image :]</label>
             <input id="backgroundInput" type="file" accept="image/png,image/jpeg,image/webp" />
-            <p class="small-help">your cutout stays in front. use the buttons below to fit it.</p>
+            <p class="small-help" data-copy="change-background-help">your cutout stays in front. use the buttons below to fit it.</p>
           </div>
 
           <div class="control-group">
-            <label class="control-label" for="zoomRange">cutout zoom</label>
-            <div class="range-row">
-              <input id="zoomRange" type="range" min="20" max="220" value="100" />
-              <span class="range-value" id="zoomValue">100%</span>
-            </div>
-            <p class="small-help">drag the cutout directly in the preview to move it :]</p>
+            <label class="control-label" for="zoomRange" data-copy="change-zoom">cutout zoom</label>
+            <div class="range-row"><input id="zoomRange" type="range" min="20" max="220" value="100" /><span class="range-value" id="zoomValue">100%</span></div>
+            <p class="small-help" data-copy="change-zoom-help">drag the cutout directly in the preview to move it :]</p>
           </div>
 
           <div class="control-group">
-            <span class="control-label">background image fit</span>
-            <div class="action-row">
-              <button class="control-button" id="coverButton" type="button">cover</button>
-              <button class="control-button" id="containButton" type="button">contain</button>
-            </div>
+            <span class="control-label" data-copy="change-fit">background image fit</span>
+            <div class="action-row"><button class="control-button" id="coverButton" type="button" data-copy="change-cover">cover</button><button class="control-button" id="containButton" type="button" data-copy="change-contain">contain</button></div>
           </div>
 
           <div class="control-group">
-            <span class="control-label">download</span>
-            <div class="action-row">
-              <button class="download-button" id="downloadPng" type="button">download PNG :D</button>
-              <button class="download-button" id="downloadJpg" type="button">download JPG :]</button>
-            </div>
-            <p class="small-help">PNG keeps the best quality. JPG is smaller but cannot be transparent.</p>
+            <span class="control-label" data-copy="change-download">download</span>
+            <div class="action-row"><button class="download-button" id="downloadPng" type="button" data-copy="change-download-png">download PNG :D</button><button class="download-button" id="downloadJpg" type="button" data-copy="change-download-jpg">download JPG :]</button></div>
+            <p class="small-help" data-copy="change-download-help">PNG keeps the best quality. JPG is smaller but cannot be transparent.</p>
           </div>
 
-          <div class="control-group">
-            <button class="reset-button" id="resetButton" type="button">start over</button>
-          </div>
+          <div class="control-group"><button class="reset-button" id="resetButton" type="button" data-copy="change-reset">start over</button></div>
         </div>
       </aside>
     </section>
 
     <section class="info-grid">
-      <article class="info-card">
-        <h2>quick + private :]</h2>
-        <p>this tool layers your cutout over a new background right in your browser. your image stays on your device while you edit it.</p>
-      </article>
-      <article class="info-card">
-        <h2>best results :3</h2>
-        <p>this works best with a transparent cutout image. if your picture still has its original background, make a transparent PNG first, then bring it back here.</p>
-      </article>
+      <article class="info-card"><h2 data-copy="change-privacy-title">quick + private :]</h2><p data-copy="change-privacy-text">this tool layers your cutout over a new background right in your browser. your image stays on your device while you edit it.</p></article>
+      <article class="info-card"><h2 data-copy="change-results-title">best results :3</h2><p data-copy="change-results-text">this works best with a transparent cutout image. if your picture still has its original background, make a transparent PNG first, then bring it back here.</p></article>
     </section>
 
     <footer>made with little pixels and a lot of :3 &nbsp;•&nbsp; <a href="https://discord.gg/GNhbQbG5cB" target="_blank" rel="noopener noreferrer">join the Discord</a></footer>
   </main>
 
   <script src="../assets/js/theme.js"></script>
+  <script src="../assets/js/site-mode.js"></script>
   <script>
     const MAX_FILE_SIZE = 15 * 1024 * 1024;
     const foregroundInput = document.getElementById("foregroundInput");
@@ -233,25 +218,14 @@
     let dragging = false;
     let dragStart = null;
 
-    function setError(message = "") {
-      errorMessage.textContent = message;
-    }
+    function setError(message = "") { errorMessage.textContent = message; }
 
     function loadImage(file) {
       return new Promise((resolve, reject) => {
         const url = URL.createObjectURL(file);
         const image = new Image();
-
-        image.onload = () => {
-          URL.revokeObjectURL(url);
-          resolve(image);
-        };
-
-        image.onerror = () => {
-          URL.revokeObjectURL(url);
-          reject(new Error("could not read that image :["));
-        };
-
+        image.onload = () => { URL.revokeObjectURL(url); resolve(image); };
+        image.onerror = () => { URL.revokeObjectURL(url); reject(new Error("could not read that image :[")); };
         image.src = url;
       });
     }
@@ -266,24 +240,16 @@
     function drawImageFit(image, fit) {
       const canvasWidth = canvas.width;
       const canvasHeight = canvas.height;
-      const ratio = fit === "cover"
-        ? Math.max(canvasWidth / image.naturalWidth, canvasHeight / image.naturalHeight)
-        : Math.min(canvasWidth / image.naturalWidth, canvasHeight / image.naturalHeight);
+      const ratio = fit === "cover" ? Math.max(canvasWidth / image.naturalWidth, canvasHeight / image.naturalHeight) : Math.min(canvasWidth / image.naturalWidth, canvasHeight / image.naturalHeight);
       const width = image.naturalWidth * ratio;
       const height = image.naturalHeight * ratio;
-
       ctx.drawImage(image, (canvasWidth - width) / 2, (canvasHeight - height) / 2, width, height);
     }
 
     function drawBackground() {
       const width = canvas.width;
       const height = canvas.height;
-
-      if (background) {
-        drawImageFit(background, bgFit);
-        return;
-      }
-
+      if (background) { drawImageFit(background, bgFit); return; }
       if (bgMode === "pink-gradient") {
         const gradient = ctx.createLinearGradient(0, 0, width, height);
         gradient.addColorStop(0, "#ffb7d6");
@@ -295,27 +261,18 @@
         gradient.addColorStop(1, "#ff8c7a");
         ctx.fillStyle = gradient;
       } else {
-        const colors = {
-          white: "#ffffff",
-          black: "#262226",
-          pink: "#ff9dc7",
-          cream: "#ffe5c9",
-          custom: colorInput.value
-        };
+        const colors = { white:"#ffffff", black:"#262226", pink:"#ff9dc7", cream:"#ffe5c9", custom:colorInput.value };
         ctx.fillStyle = colors[bgMode] || colorInput.value;
       }
-
       ctx.fillRect(0, 0, width, height);
     }
 
     function drawForeground() {
       if (!foreground) return;
-
       const base = Math.min(canvas.width / foreground.naturalWidth, canvas.height / foreground.naturalHeight);
       const scale = base * zoom;
       const width = foreground.naturalWidth * scale;
       const height = foreground.naturalHeight * scale;
-
       ctx.drawImage(foreground, (canvas.width - width) / 2 + offsetX, (canvas.height - height) / 2 + offsetY, width, height);
     }
 
@@ -329,17 +286,8 @@
     async function chooseForeground(file) {
       setError();
       if (!file) return;
-
-      if (!["image/png", "image/webp"].includes(file.type)) {
-        setError("please choose a transparent PNG or WebP image :[");
-        return;
-      }
-
-      if (file.size > MAX_FILE_SIZE) {
-        setError("that image is over 15 MB—please pick a smaller one :[");
-        return;
-      }
-
+      if (!["image/png", "image/webp"].includes(file.type)) return setError("please choose a transparent PNG or WebP image :[");
+      if (file.size > MAX_FILE_SIZE) return setError("that image is over 15 MB—please pick a smaller one :[");
       try {
         foreground = await loadImage(file);
         setCanvasSize(foreground);
@@ -350,39 +298,31 @@
         zoomValue.textContent = "100%";
         editor.classList.add("visible");
         render();
-      } catch (error) {
-        setError(error.message);
-      }
+      } catch (error) { setError(error.message); }
     }
 
     async function chooseBackground(file) {
       if (!file) return;
-
       try {
         background = await loadImage(file);
         presetButtons.forEach((button) => button.classList.remove("active"));
         render();
-      } catch (error) {
-        setError(error.message);
-      }
+      } catch (error) { setError(error.message); }
     }
 
     function canvasPoint(event) {
       const rectangle = canvas.getBoundingClientRect();
-      return {
-        x: (event.clientX - rectangle.left) * (canvas.width / rectangle.width),
-        y: (event.clientY - rectangle.top) * (canvas.height / rectangle.height)
-      };
+      return { x:(event.clientX - rectangle.left) * (canvas.width / rectangle.width), y:(event.clientY - rectangle.top) * (canvas.height / rectangle.height) };
     }
 
     function stopDrag() {
       dragging = false;
+      dragStart = null;
       canvas.classList.remove("dragging");
     }
 
     function download(type) {
       if (!foreground) return;
-
       const link = document.createElement("a");
       link.download = type === "image/png" ? "new-background.png" : "new-background.jpg";
       link.href = canvas.toDataURL(type, type === "image/jpeg" ? 0.92 : undefined);
@@ -392,31 +332,16 @@
     foregroundInput.addEventListener("change", () => chooseForeground(foregroundInput.files[0]));
     backgroundInput.addEventListener("change", () => chooseBackground(backgroundInput.files[0]));
     uploadLink.addEventListener("click", () => foregroundInput.click());
-
-    ["dragenter", "dragover"].forEach((eventName) => {
-      dropZone.addEventListener(eventName, (event) => {
-        event.preventDefault();
-        dropZone.classList.add("dragover");
-      });
-    });
-
-    ["dragleave", "drop"].forEach((eventName) => {
-      dropZone.addEventListener(eventName, (event) => {
-        event.preventDefault();
-        dropZone.classList.remove("dragover");
-      });
-    });
-
+    ["dragenter", "dragover"].forEach((eventName) => dropZone.addEventListener(eventName, (event) => { event.preventDefault(); dropZone.classList.add("dragover"); }));
+    ["dragleave", "drop"].forEach((eventName) => dropZone.addEventListener(eventName, (event) => { event.preventDefault(); dropZone.classList.remove("dragover"); }));
     dropZone.addEventListener("drop", (event) => chooseForeground(event.dataTransfer.files[0]));
 
-    presetButtons.forEach((button) => {
-      button.addEventListener("click", () => {
-        background = null;
-        bgMode = button.dataset.preset;
-        presetButtons.forEach((item) => item.classList.toggle("active", item === button));
-        render();
-      });
-    });
+    presetButtons.forEach((button) => button.addEventListener("click", () => {
+      background = null;
+      bgMode = button.dataset.preset;
+      presetButtons.forEach((item) => item.classList.toggle("active", item === button));
+      render();
+    }));
 
     colorInput.addEventListener("input", () => {
       background = null;
@@ -444,15 +369,8 @@
       render();
     });
 
-    coverButton.addEventListener("click", () => {
-      bgFit = "cover";
-      render();
-    });
-
-    containButton.addEventListener("click", () => {
-      bgFit = "contain";
-      render();
-    });
+    coverButton.addEventListener("click", () => { bgFit = "cover"; render(); });
+    containButton.addEventListener("click", () => { bgFit = "contain"; render(); });
 
     canvas.addEventListener("pointerdown", (event) => {
       if (!foreground) return;
@@ -473,7 +391,6 @@
     canvas.addEventListener("pointerup", stopDrag);
     canvas.addEventListener("pointercancel", stopDrag);
     canvas.addEventListener("lostpointercapture", stopDrag);
-
     downloadPng.addEventListener("click", () => download("image/png"));
     downloadJpg.addEventListener("click", () => download("image/jpeg"));
 
