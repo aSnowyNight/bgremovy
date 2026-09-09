@@ -104,6 +104,7 @@ input {
 }
 
 .theme-toggle,
+.site-mode-toggle,
 .discord-link,
 .back-link,
 .choose-button,
@@ -120,11 +121,21 @@ input {
   transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.theme-toggle {
+.theme-toggle,
+.site-mode-toggle {
   min-height: 34px;
   padding: 6px 9px;
   white-space: nowrap;
   font-size: 0.95rem;
+}
+
+.site-mode-toggle {
+  position: relative;
+}
+
+[data-site-mode="professional"] .site-mode-toggle {
+  border-color: var(--pink);
+  background: var(--surface-2);
 }
 
 .theme-menu {
@@ -159,6 +170,7 @@ input {
 }
 
 .theme-toggle:hover,
+.site-mode-toggle:hover,
 .discord-link:hover,
 .back-link:hover,
 .choose-button:hover,
@@ -170,6 +182,7 @@ input {
 }
 
 .theme-toggle:focus-visible,
+.site-mode-toggle:focus-visible,
 .discord-link:focus-visible,
 .back-link:focus-visible,
 .choose-button:focus-visible,
@@ -179,6 +192,13 @@ input {
 .theme-option:focus-visible {
   outline: 3px solid var(--pink-soft);
   outline-offset: 3px;
+}
+
+[data-site-mode="professional"] .site-mode-toggle,
+[data-site-mode="professional"] .theme-toggle,
+[data-site-mode="professional"] .theme-option {
+  font-family: "Nunito", system-ui, sans-serif;
+  font-weight: 700;
 }
 
 [data-theme="blackout"] .image-area,
@@ -196,7 +216,8 @@ input {
 }
 
 @media (max-width: 620px) {
-  .theme-toggle {
+  .theme-toggle,
+  .site-mode-toggle {
     font-size: 0.85rem;
   }
 }
