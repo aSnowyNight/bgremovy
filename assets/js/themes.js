@@ -1,92 +1,100 @@
 (() => {
   const STORAGE_KEY = "removy-theme";
-  const VALID_THEMES = new Set(["light", "dark", "creamsicle"]);
+  const DEFAULT_THEME = "light";
 
-  function getTheme() {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return VALID_THEMES.has(saved) ? saved : "light";
+  const THEMES = {
+    light: "light mode :P",
+    dark: "dark mode :3",
+    creamsicle: "creamsicle :D",
+    blackout: "blackout 0_0"
+  };
+
+  const toggle = document.querySelector("[data-theme-toggle]");
+  const menu = document.querySelector("[data-theme-menu]");
+  const options = document.querySelectorAll("[data-theme-choice]");
+
+  function validTheme(theme) {
+    return Object.prototype.hasOwnProperty.call(THEMES, theme);
   }
 
-  function applyTheme(theme) {
-    const nextTheme = VALID_THEMES.has(theme) ? theme : "light";
-    document.documentElement.dataset.theme = nextTheme === "light" ? "" : nextTheme;
-    localStorage.setItem(STORAGE_KEY, nextTheme);
-    updateControls(nextTheme);
-  }
+  function applyTheme(theme, shouldSave = true) {
+    const selectedTheme = validTheme(theme) ? theme : DEFAULT_THEME;
 
-  function themeLabel(theme) {
-    if (theme === "dark") return "dark mode :3";
-    if (theme === "creamsicle") return "creamsicle :D";
-    return "light mode :P";
-  }
+    if (selectedTheme === "light") {
+      document.documentElement.removeAttribute("data-theme");
+    } else {
+      document.documentElement.dataset.theme = selectedTheme;
+    }
 
-  function updateControls(theme) {
-    document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
-      button.textContent = themeLabel(theme);
-    });
+    if (shouldSave) {
+      try {
+        localStorage.setItem(STORAGE_KEY, selectedTheme);
+      } catch (_) {}
+    }
 
-    document.querySelectorAll("[data-theme-choice]").forEach((option) => {
-      option.setAttribute(
-        "aria-current",
-        String(option.dataset.themeChoice === theme)
-      );
-    });
-  }
+    if (toggle) {
+      toggle.textContent = THEMES[selectedTheme];
+    }
 
-  function closeMenus() {
-    document.querySelectorAll("[data-theme-menu]").forEach((menu) => {
-      menu.hidden = true;
-    });
-
-    document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
-      button.setAttribute("aria-expanded", "false");
-    });
-  }
-
-  function initialize() {
-    applyTheme(getTheme());
-
-    document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
-      button.addEventListener("click", (event) => {
-        event.stopPropagation();
-        const picker = button.closest(".theme-picker");
-        const menu = picker?.querySelector("[data-theme-menu]");
-        if (!menu) return;
-
-        const willOpen = menu.hidden;
-        closeMenus();
-        menu.hidden = !willOpen;
-        button.setAttribute("aria-expanded", String(willOpen));
-      });
-    });
-
-    document.querySelectorAll("[data-theme-choice]").forEach((option) => {
-      option.addEventListener("click", () => {
-        applyTheme(option.dataset.themeChoice);
-        closeMenus();
-      });
-    });
-
-    document.addEventListener("click", (event) => {
-      if (!event.target.closest(".theme-picker")) closeMenus();
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") closeMenus();
-    });
-
-    window.addEventListener("storage", (event) => {
-      if (event.key === STORAGE_KEY && VALID_THEMES.has(event.newValue)) {
-        applyTheme(event.newValue);
-      }
+    options.forEach((option) => {
+      const isSelected = option.dataset.themeChoice === selectedTheme;
+      option.setAttribute("aria-current", String(isSelected));
     });
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initialize, { once: true });
-  } else {
-    initialize();
+  function closeMenu() {
+    if (menu) menu.hidden = true;
+    if (toggle) toggle.setAttribute("aria-expanded", "false");
   }
 
-  window.RemovyThemes = { applyTheme, getTheme };
+  function openMenu() {
+    if (menu) menu.hidden = false;
+    if (toggle) toggle.setAttribute("aria-expanded", "true");
+  }
+
+  let savedTheme = DEFAULT_THEME;
+
+  try {
+    const value = localStorage.getItem(STORAGE_KEY);
+    if (validTheme(value)) savedTheme = value;
+  } catch (_) {}
+
+  applyTheme(savedTheme, false);
+
+  if (!toggle || !menu) return;
+
+  toggle.addEventListener("click", (event) => {
+    event.stopPropagation();
+
+    if (menu.hidden) {
+      openMenu();
+    } else {
+      closeMenu();
+    }
+  });
+
+  options.forEach((option) => {
+    option.addEventListener("click", () => {
+      applyTheme(option.dataset.themeChoice);
+      closeMenu();
+    });
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest(".theme-picker")) {
+      closeMenu();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeMenu();
+      toggle.focus();
+    }
+  });
+
+  window.addEventListener("storage", (event) => {
+    if (event.key !== STORAGE_KEY) return;
+    applyTheme(validTheme(event.newValue) ? event.newValue : DEFAULT_THEME, false);
+  });
 })();
