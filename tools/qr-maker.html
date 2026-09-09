@@ -96,131 +96,166 @@
   <script src="../assets/js/theme.js"></script>
   <script src="../assets/js/site-mode.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
-  <script>
-    const contentInput = document.getElementById("contentInput");
-    const foregroundColor = document.getElementById("foregroundColor");
-    const foregroundValue = document.getElementById("foregroundValue");
-    const backgroundColor = document.getElementById("backgroundColor");
-    const backgroundValue = document.getElementById("backgroundValue");
-    const sizeRange = document.getElementById("sizeRange");
-    const sizeValue = document.getElementById("sizeValue");
-    const canvas = document.getElementById("qrCanvas");
-    const context = canvas.getContext("2d");
-    const emptyState = document.getElementById("emptyState");
-    const errorMessage = document.getElementById("errorMessage");
-    const downloadPng = document.getElementById("downloadPng");
-    const downloadSvg = document.getElementById("downloadSvg");
-    const resetButton = document.getElementById("resetButton");
-    const presetButtons = document.querySelectorAll("[data-example]");
-    let qrMatrix = null;
-   function drawQr() {
-  const text = contentInput.value.trim();
-  errorMessage.textContent = "";
+<script>
+  const contentInput = document.getElementById("contentInput");
+  const foregroundColor = document.getElementById("foregroundColor");
+  const foregroundValue = document.getElementById("foregroundValue");
+  const backgroundColor = document.getElementById("backgroundColor");
+  const backgroundValue = document.getElementById("backgroundValue");
+  const sizeRange = document.getElementById("sizeRange");
+  const sizeValue = document.getElementById("sizeValue");
+  const canvas = document.getElementById("qrCanvas");
+  const emptyState = document.getElementById("emptyState");
+  const errorMessage = document.getElementById("errorMessage");
+  const downloadPng = document.getElementById("downloadPng");
+  const downloadSvg = document.getElementById("downloadSvg");
+  const resetButton = document.getElementById("resetButton");
+  const presetButtons = document.querySelectorAll("[data-example]");
 
-  if (!text) {
-    qrMatrix = null;
-    canvas.hidden = true;
-    emptyState.hidden = false;
-    downloadPng.disabled = true;
-    downloadSvg.disabled = true;
-    return;
+  let hasQrCode = false;
+
+  function setControlsEnabled(enabled) {
+    downloadPng.disabled = !enabled;
+    downloadSvg.disabled = !enabled;
   }
 
-  const size = Number(sizeRange.value);
+  function drawQr() {
+    const text = contentInput.value.trim();
+    errorMessage.textContent = "";
 
-  QRCode.toCanvas(
-    canvas,
-    text,
-    {
-      width: size,
-      margin: 4,
-      errorCorrectionLevel: "H",
-      color: {
-        dark: foregroundColor.value,
-        light: backgroundColor.value
-      }
-    },
-    (error) => {
-      if (error) {
-        qrMatrix = null;
-        canvas.hidden = true;
-        emptyState.hidden = false;
-        downloadPng.disabled = true;
-        downloadSvg.disabled = true;
-        errorMessage.textContent = error.message || "could not make that QR :[";
-        return;
-      }
-
-      qrMatrix = true;
-      canvas.hidden = false;
-      emptyState.hidden = true;
-      downloadPng.disabled = false;
-      downloadSvg.disabled = false;
+    if (!text) {
+      hasQrCode = false;
+      canvas.hidden = true;
+      emptyState.hidden = false;
+      setControlsEnabled(false);
+      return;
     }
-  );
-}
 
-function setColor(input, valueInput) {
-  input.addEventListener("input", () => {
-    valueInput.value = input.value;
+    QRCode.toCanvas(
+      canvas,
+      text,
+      {
+        width: Number(sizeRange.value),
+        margin: 4,
+        errorCorrectionLevel: "H",
+        color: {
+          dark: foregroundColor.value,
+          light: backgroundColor.value
+        }
+      },
+      (error) => {
+        if (error) {
+          hasQrCode = false;
+          canvas.hidden = true;
+          emptyState.hidden = false;
+          setControlsEnabled(false);
+          errorMessage.textContent =
+            error.message || "could not make that QR :[";
+          return;
+        }
+
+        hasQrCode = true;
+        canvas.hidden = false;
+        emptyState.hidden = true;
+        setControlsEnabled(true);
+      }
+    );
+  }
+
+  function setColor(input, valueInput) {
+    input.addEventListener("input", () => {
+      valueInput.value = input.value;
+      drawQr();
+    });
+
+    valueInput.addEventListener("change", () => {
+      if (/^#[0-9a-fA-F]{6}$/.test(valueInput.value)) {
+        input.value = valueInput.value;
+        drawQr();
+      } else {
+        valueInput.value = input.value;
+      }
+    });
+  }
+
+  function downloadCanvas() {
+    if (!hasQrCode) return;
+
+    const link = document.createElement("a");
+    link.download = "little-qr-code.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  }
+
+  function downloadSvgFile() {
+    const text = contentInput.value.trim();
+
+    if (!hasQrCode || !text) return;
+
+    QRCode.toString(
+      text,
+      {
+        type: "svg",
+        margin: 4,
+        errorCorrectionLevel: "H",
+        color: {
+          dark: foregroundColor.value,
+          light: backgroundColor.value
+        }
+      },
+      (error, svg) => {
+        if (error) {
+          errorMessage.textContent =
+            error.message || "could not make that QR :[";
+          return;
+        }
+
+        const url = URL.createObjectURL(
+          new Blob([svg], { type: "image/svg+xml" })
+        );
+
+        const link = document.createElement("a");
+        link.download = "little-qr-code.svg";
+        link.href = url;
+        link.click();
+
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+    );
+  }
+
+  contentInput.addEventListener("input", drawQr);
+
+  sizeRange.addEventListener("input", () => {
+    sizeValue.textContent = `${sizeRange.value} px`;
     drawQr();
   });
 
-  valueInput.addEventListener("change", () => {
-    if (/^#[0-9a-fA-F]{6}$/.test(valueInput.value)) {
-      input.value = valueInput.value;
+  setColor(foregroundColor, foregroundValue);
+  setColor(backgroundColor, backgroundValue);
+
+  presetButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      contentInput.value = button.dataset.example;
+      contentInput.focus();
       drawQr();
-    } else {
-      valueInput.value = input.value;
-    }
+    });
   });
-}
 
-function downloadCanvas() {
-  if (!qrMatrix) return;
+  downloadPng.addEventListener("click", downloadCanvas);
+  downloadSvg.addEventListener("click", downloadSvgFile);
 
-  const link = document.createElement("a");
-  link.download = "little-qr-code.png";
-  link.href = canvas.toDataURL("image/png");
-  link.click();
-}
-
-function downloadSvgFile() {
-  const text = contentInput.value.trim();
-  if (!text) return;
-
-  QRCode.toString(
-    text,
-    {
-      type: "svg",
-      margin: 4,
-      errorCorrectionLevel: "H",
-      color: {
-        dark: foregroundColor.value,
-        light: backgroundColor.value
-      }
-    },
-    (error, svg) => {
-      if (error) {
-        errorMessage.textContent = error.message || "could not make that QR :[";
-        return;
-      }
-
-      const blob = new Blob([svg], { type: "image/svg+xml" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-
-      link.download = "little-qr-code.svg";
-      link.href = url;
-      link.click();
-
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    }
-  );
-}
-    function downloadCanvas() { if (!qrMatrix) return; const link = document.createElement("a"); link.download = "little-qr-code.png"; link.href = canvas.toDataURL("image/png"); link.click(); }
-    function downloadSvgFile() { if (!qrMatrix) return; const cells = []; qrMatrix.forEach((row, y) => row.forEach((dark, x) => { if (dark) cells.push(`M${x} ${y}h1v1H${x}z`); })); const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${qrMatrix.length} ${qrMatrix.length}" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="${backgroundColor.value}"/><path fill="${foregroundColor.value}" d="${cells.join("")}"/></svg>`; const link = document.createElement("a"); link.download = "little-qr-code.svg"; link.href = URL.createObjectURL(new Blob([svg], { type:"image/svg+xml" })); link.click(); setTimeout(() => URL.revokeObjectURL(link.href), 1000); }
-    contentInput.addEventListener("input", drawQr); sizeRange.addEventListener("input", () => { sizeValue.textContent = `${sizeRange.value} px`; drawQr(); }); setColor(foregroundColor, foregroundValue); setColor(backgroundColor, backgroundValue); presetButtons.forEach((button) => button.addEventListener("click", () => { contentInput.value = button.dataset.example; contentInput.focus(); drawQr(); })); downloadPng.addEventListener("click", downloadCanvas); downloadSvg.addEventListener("click", downloadSvgFile); resetButton.addEventListener("click", () => { contentInput.value = ""; foregroundColor.value = "#262226"; foregroundValue.value = "#262226"; backgroundColor.value = "#ffffff"; backgroundValue.value = "#ffffff"; sizeRange.value = 1024; sizeValue.textContent = "1024 px"; drawQr(); contentInput.focus(); });
-  </script>
+  resetButton.addEventListener("click", () => {
+    contentInput.value = "";
+    foregroundColor.value = "#262226";
+    foregroundValue.value = "#262226";
+    backgroundColor.value = "#ffffff";
+    backgroundValue.value = "#ffffff";
+    sizeRange.value = "1024";
+    sizeValue.textContent = "1024 px";
+    drawQr();
+    contentInput.focus();
+  });
+</script>
 </body>
 </html>
