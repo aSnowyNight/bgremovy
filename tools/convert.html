@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Convert PNG, JPG, and WebP images with little image thingies." />
+  <title>convert image :3 • little image thingies</title>
+  <link rel="stylesheet" href="../assets/css/theme.css" />
+  <style>
+    .page { width:min(100% - 32px,960px); margin:24px auto 58px; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .brand { color:var(--pink); font:700 clamp(1.65rem,4vw,2.2rem)/.9 "Gaegu","Comic Sans MS",cursive; text-decoration:none; letter-spacing:.01em; }
+    .topbar-actions { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:8px; }
+    .discord-link,.back-link,.choose-button,.format-button,.download-button,.reset-button { border:1.5px solid var(--border); border-radius:8px; color:var(--pink-dark); background:transparent; font:700 1rem "Gaegu","Comic Sans MS",cursive; cursor:pointer; text-decoration:none; transition:transform .15s ease,background .15s ease,color .15s ease,box-shadow .15s ease; }
+    .discord-link { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:34px; padding:6px 10px 5px; font:700 .95rem/1 "Gaegu","Comic Sans MS",cursive; white-space:nowrap; }
+    .discord-icon { width:18px; height:18px; display:block; flex:0 0 18px; fill:currentColor; }
+    .discord-link:hover,.back-link:hover,.choose-button:hover,.format-button:hover,.reset-button:hover { background:var(--pink-soft); transform:translateY(-1px); }
+    .discord-link:focus-visible,.back-link:focus-visible,.choose-button:focus-visible,.format-button:focus-visible,.download-button:focus-visible,.reset-button:focus-visible { outline:3px solid var(--pink-soft); outline-offset:3px; }
+    .back-link { display:inline-flex; align-items:center; min-height:34px; margin-top:26px; padding:6px 9px; }
+    .hero { margin-top:17px; padding:clamp(24px,5vw,42px); border:1.5px solid var(--pink-soft); border-radius:20px; background:var(--surface); box-shadow:var(--card-shadow); }
+    .eyebrow { width:fit-content; margin:0 0 10px; padding:5px 10px; border:1px solid var(--pink-soft); border-radius:999px; color:var(--pink-dark); background:var(--surface-2); font:700 .95rem "Gaegu","Comic Sans MS",cursive; }
+    h1 { margin:0; color:var(--pink); font:700 clamp(3rem,7vw,4.7rem)/.8 "Gaegu","Comic Sans MS",cursive; letter-spacing:.01em; }
+    .hero-copy { max-width:620px; margin:15px 0 0; color:var(--muted); font-size:1rem; line-height:1.55; }
+    .free-badge { display:inline-block; margin-top:16px; padding:5px 10px; border:1px solid var(--pink-soft); border-radius:999px; color:var(--pink-dark); background:var(--surface-2); font:700 .95rem "Gaegu","Comic Sans MS",cursive; }
+    .upload-card { min-height:178px; display:grid; place-items:center; margin-top:20px; border:2px dashed var(--border); border-radius:15px; padding:28px; background:var(--surface); text-align:center; cursor:pointer; transition:background .15s ease,transform .15s ease,box-shadow .15s ease; }
+    .upload-card:hover,.upload-card.dragover { background:var(--pink-soft); box-shadow:0 8px 26px var(--shadow); transform:translateY(-2px); }
+    .upload-icon { display:grid; place-items:center; width:53px; height:53px; margin:0 auto 8px; border:1px solid var(--pink-soft); border-radius:16px; color:var(--pink-dark); background:var(--surface-2); font:700 2.3rem/1 "Gaegu","Comic Sans MS",cursive; }
+    .upload-card p { margin:0 0 12px; color:var(--pink); font:700 1.3rem "Gaegu","Comic Sans MS",cursive; }
+    .choose-button { display:inline-block; padding:6px 12px; }
+    input[type="file"] { display:none; }
+    .upload-link { display:block; width:fit-content; margin:12px auto 0; border:0; padding:0; color:var(--pink); background:transparent; text-decoration:underline; text-underline-offset:3px; font:700 1rem "Gaegu","Comic Sans MS",cursive; cursor:pointer; }
+    .tip { margin:7px 0 0; color:var(--muted); text-align:center; font:400 .92rem "Gaegu","Comic Sans MS",cursive; }
+    .error { min-height:1.25em; margin:12px 0 0; color:#df397c; text-align:center; font-size:.9rem; }
+    .editor { display:none; grid-template-columns:minmax(0,1.15fr) minmax(275px,.85fr); gap:15px; margin-top:20px; }
+    .editor.visible { display:grid; }
+    .preview-card,.controls-card { overflow:hidden; border:1.5px solid var(--pink-soft); border-radius:15px; background:var(--surface); box-shadow:var(--card-shadow); }
+    .preview-card h2,.controls-card h2 { margin:0; padding:10px 13px; border-bottom:1px solid var(--pink-soft); color:var(--pink-dark); font:700 1.25rem/1 "Gaegu","Comic Sans MS",cursive; }
+    .preview-wrap { display:grid; place-items:center; min-height:350px; padding:13px; background:#f7f1f4; }
+    [data-theme="blackout"] .preview-wrap { background:#09090b; }
+    #previewImage { display:block; max-width:100%; max-height:520px; border-radius:7px; box-shadow:0 4px 15px rgba(0,0,0,.12); object-fit:contain; }
+    .controls-body { padding:14px; }
+    .control-group { margin-bottom:18px; }
+    .control-group:last-child { margin-bottom:0; }
+    .control-label { display:block; margin-bottom:7px; color:var(--pink-dark); font:700 1.1rem/1 "Gaegu","Comic Sans MS",cursive; }
+    .format-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    .format-button { min-height:54px; padding:8px 5px; border-color:var(--pink-soft); color:var(--ink); background:var(--surface-2); font-size:1rem; }
+    .format-button.active { border-color:var(--border); background:var(--pink-soft); color:var(--pink-dark); transform:translateY(-1px); }
+    .format-button small { display:block; margin-top:2px; color:var(--muted); font:600 .68rem "Nunito",system-ui,sans-serif; }
+    .range-row { display:flex; align-items:center; gap:9px; }
+    input[type="range"] { width:100%; accent-color:var(--pink); }
+    .range-value { min-width:42px; color:var(--pink-dark); text-align:right; font:700 1rem "Gaegu","Comic Sans MS",cursive; }
+    .small-help { margin:7px 0 0; color:var(--muted); font-size:.78rem; line-height:1.4; }
+    .info-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .info-bit { padding:10px; border:1px solid var(--pink-soft); border-radius:10px; background:var(--surface-2); }
+    .info-label { display:block; color:var(--muted); font-size:.72rem; }
+    .info-value { display:block; margin-top:3px; color:var(--pink-dark); font:700 1.1rem/1 "Gaegu","Comic Sans MS",cursive; overflow-wrap:anywhere; }
+    .action-row { display:flex; flex-wrap:wrap; gap:8px; }
+    .download-button { display:inline-flex; align-items:center; justify-content:center; min-height:40px; padding:8px 12px; border-color:var(--pink); background:var(--pink); color:#fff; box-shadow:0 5px 13px var(--shadow); }
+    .download-button:hover { background:var(--pink-dark); transform:translateY(-1px); }
+    [data-theme="blackout"] .download-button { color:#050505; }
+    .reset-button { min-height:40px; padding:8px 12px; }
+    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:21px; }
+    .info-card { padding:17px; border:1.5px solid var(--pink-soft); border-radius:15px; background:var(--surface); box-shadow:var(--card-shadow); }
+    .info-card h2 { margin:0 0 6px; color:var(--pink-dark); font:700 1.35rem/1 "Gaegu","Comic Sans MS",cursive; }
+    .info-card p { margin:0; color:var(--muted); font-size:.86rem; line-height:1.48; }
+    footer { margin-top:36px; color:var(--muted); text-align:center; font:400 .92rem/1.45 "Gaegu","Comic Sans MS",cursive; }
+    footer a { color:var(--pink-dark); }
+    @media (max-width:760px) { .editor { grid-template-columns:1fr; } .preview-wrap { min-height:280px; } }
+    @media (max-width:620px) { .page { width:min(100% - 24px,960px); margin-top:18px; } .topbar { align-items:flex-start; gap:10px; } .brand { max-width:155px; } .topbar-actions { gap:5px; } .site-mode-toggle { font-size:.85rem; } .discord-link { display:grid; place-items:center; width:34px; height:34px; min-height:34px; padding:0; } .discord-link span { display:none; } .discord-icon { width:17px; height:17px; flex:none; } .hero { padding:25px 20px; } .preview-wrap { min-height:225px; padding:8px; } .info-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a class="brand" href="../index.html" aria-label="little image thingies home">little image<br>thingies :3</a>
+      <nav class="topbar-actions" aria-label="Site links">
+        <a class="discord-link" href="https://discord.gg/GNhbQbG5cB" target="_blank" rel="noopener noreferrer" aria-label="Join the Discord community" title="join the discord :3"><svg class="discord-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.54 4.64A16.4 16.4 0 0 0 15.49 3.4l-.5 1.02a15.2 15.2 0 0 0-5.98 0l-.5-1.02a16.5 16.5 0 0 0-4.05 1.24C1.9 8.45 1.2 12.18 1.54 15.86a16.3 16.3 0 0 0 4.97 2.5l1.21-1.63a9.45 9.45 0 0 1-1.9-.92l.46-.36c3.67 1.7 7.66 1.7 11.28 0l.46.36c-.61.36-1.25.67-1.91.92l1.21 1.63a16.2 16.2 0 0 0 4.97-2.5c.41-4.27-.7-7.96-2.76-11.22ZM8.68 13.6c-1.1 0-2-1.01-2-2.26s.88-2.26 2-2.26c1.13 0 2.02 1.02 2 2.26 0 1.25-.88 2.26-2 2.26Zm6.64 0c-1.1 0-2-1.01-2-2.26s.88-2.26 2-2.26c1.13 0 2.02 1.02 2 2.26 0 1.25-.87 2.26-2 2.26Z"/></svg><span>discord :3</span></a>
+        <button class="site-mode-toggle" data-site-mode-toggle type="button" aria-pressed="false" aria-label="Switch to professional mode" title="Switch to professional mode">professional mode</button>
+        <div class="theme-picker" aria-label="Choose a color theme"><button class="theme-toggle" data-theme-toggle type="button" aria-expanded="false">themes :3</button><div class="theme-menu" data-theme-menu hidden><button type="button" class="theme-option" data-theme-choice="light">light mode :P</button><button type="button" class="theme-option" data-theme-choice="dark">dark mode :3</button><button type="button" class="theme-option" data-theme-choice="creamsicle">creamsicle :D</button><button type="button" class="theme-option" data-theme-choice="blackout">blackout 0_0</button></div></div>
+      </nav>
+    </header>
+
+    <a class="back-link" href="../index.html">← all tool thingies</a>
+    <section class="hero" aria-labelledby="pageTitle"><p class="eyebrow">little image thingies • browser tool</p><h1 id="pageTitle">convert image :3</h1><p class="hero-copy">turn JPGs, PNGs, and WebPs into each other right in your browser. no account, no upload, no fuss :]</p><span class="free-badge">♡ browser-side • no upload needed</span></section>
+
+    <label class="upload-card" id="dropZone" for="imageInput"><div><span class="upload-icon" aria-hidden="true">↑</span><p>put image here :P</p><span class="choose-button">choose image :3</span></div></label>
+    <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" />
+    <button class="upload-link" id="uploadLink" type="button">or upload an image :]</button>
+    <p class="tip">PNG, JPG, and WebP up to 20 MB :3</p>
+    <p class="error" id="errorMessage" role="alert"></p>
+
+    <section class="editor" id="editor" aria-label="Image conversion editor">
+      <article class="preview-card"><h2>your image :D</h2><div class="preview-wrap"><img id="previewImage" alt="Selected image preview" /></div></article>
+      <aside class="controls-card"><h2>turn it into :3</h2><div class="controls-body">
+        <div class="control-group"><span class="control-label">choose an output format</span><div class="format-grid"><button class="format-button" data-format="image/jpeg" type="button">JPG<small>small photo files</small></button><button class="format-button active" data-format="image/png" type="button">PNG<small>keeps transparency</small></button><button class="format-button" data-format="image/webp" type="button">WebP<small>modern + compact</small></button></div></div>
+        <div class="control-group" id="qualityGroup"><label class="control-label" for="qualityRange">quality</label><div class="range-row"><input id="qualityRange" type="range" min="20" max="100" value="92" /><span class="range-value" id="qualityValue">92%</span></div><p class="small-help">quality applies to JPG and WebP. PNG stays lossless.</p></div>
+        <div class="info-row"><div class="info-bit"><span class="info-label">original type</span><span class="info-value" id="originalType">—</span></div><div class="info-bit"><span class="info-label">new type</span><span class="info-value" id="newType">PNG</span></div><div class="info-bit"><span class="info-label">dimensions</span><span class="info-value" id="dimensions">—</span></div><div class="info-bit"><span class="info-label">new file size</span><span class="info-value" id="outputSize">—</span></div></div>
+        <div class="control-group" style="margin-top:18px"><div class="action-row"><button class="download-button" id="downloadButton" type="button">download converted image :D</button><button class="reset-button" id="resetButton" type="button">start over</button></div></div>
+      </div></aside>
+    </section>
+
+    <section class="info-grid"><article class="info-card"><h2>format notes :]</h2><p>choose PNG when you need transparency, JPG for broadly compatible photo files, or WebP for smaller modern image files.</p></article><article class="info-card"><h2>quick + private :3</h2><p>conversion happens in your browser. the image stays on your device while you make a new file.</p></article></section>
+    <footer>made with little pixels and a lot of :3 &nbsp;•&nbsp; <a href="https://discord.gg/GNhbQbG5cB" target="_blank" rel="noopener noreferrer">join the Discord</a></footer>
+  </main>
+
+  <script src="../assets/js/theme.js"></script>
+  <script src="../assets/js/site-mode.js"></script>
+  <script>
+    const MAX_FILE_SIZE = 20 * 1024 * 1024;
+    const imageInput = document.getElementById("imageInput");
+    const dropZone = document.getElementById("dropZone");
+    const uploadLink = document.getElementById("uploadLink");
+    const editor = document.getElementById("editor");
+    const errorMessage = document.getElementById("errorMessage");
+    const previewImage = document.getElementById("previewImage");
+    const formatButtons = document.querySelectorAll("[data-format]");
+    const qualityGroup = document.getElementById("qualityGroup");
+    const qualityRange = document.getElementById("qualityRange");
+    const qualityValue = document.getElementById("qualityValue");
+    const originalType = document.getElementById("originalType");
+    const newType = document.getElementById("newType");
+    const dimensions = document.getElementById("dimensions");
+    const outputSize = document.getElementById("outputSize");
+    const downloadButton = document.getElementById("downloadButton");
+    const resetButton = document.getElementById("resetButton");
+    let sourceFile = null, sourceImage = null, sourceUrl = null, resultBlob = null, outputFormat = "image/png";
+
+    function setError(message = "") { errorMessage.textContent = message; }
+    function formatName(type) { return type === "image/jpeg" ? "JPG" : type === "image/webp" ? "WebP" : "PNG"; }
+    function extensionFor(type) { return type === "image/jpeg" ? "jpg" : type === "image/webp" ? "webp" : "png"; }
+    function formatBytes(bytes) { if (!Number.isFinite(bytes)) return "—"; if (bytes < 1024) return `${bytes} B`; const value = bytes / 1024; return value < 1024 ? `${value.toFixed(value >= 10 ? 0 : 1)} KB` : `${(value / 1024).toFixed(1)} MB`; }
+    function loadImage(file) { return new Promise((resolve, reject) => { const url = URL.createObjectURL(file), image = new Image(); image.onload = () => { URL.revokeObjectURL(url); resolve(image); }; image.onerror = () => { URL.revokeObjectURL(url); reject(new Error("could not read that image :[")); }; image.src = url; }); }
+    function renderOutput() {
+      if (!sourceImage) return;
+      const canvas = document.createElement("canvas"); canvas.width = sourceImage.naturalWidth; canvas.height = sourceImage.naturalHeight;
+      const context = canvas.getContext("2d");
+      if (outputFormat !== "image/png") { context.fillStyle = "#ffffff"; context.fillRect(0, 0, canvas.width, canvas.height); }
+      context.drawImage(sourceImage, 0, 0);
+      canvas.toBlob((blob) => { if (!blob) return setError("your browser could not make that format :["); resultBlob = blob; outputSize.textContent = formatBytes(blob.size); }, outputFormat, outputFormat === "image/png" ? undefined : Number(qualityRange.value) / 100);
+    }
+    async function chooseFile(file) {
+      setError(); if (!file) return;
+      if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) return setError("please choose a PNG, JPG, or WebP image :[");
+      if (file.size > MAX_FILE_SIZE) return setError("that image is over 20 MB—please pick a smaller one :[");
+      try { sourceFile = file; sourceImage = await loadImage(file); if (sourceUrl) URL.revokeObjectURL(sourceUrl); sourceUrl = URL.createObjectURL(file); previewImage.src = sourceUrl; originalType.textContent = formatName(file.type); dimensions.textContent = `${sourceImage.naturalWidth} × ${sourceImage.naturalHeight}`; editor.classList.add("visible"); renderOutput(); } catch (error) { setError(error.message); }
+    }
+    function resetApp() { sourceFile = null; sourceImage = null; resultBlob = null; imageInput.value = ""; if (sourceUrl) URL.revokeObjectURL(sourceUrl); sourceUrl = null; previewImage.removeAttribute("src"); editor.classList.remove("visible"); originalType.textContent = "—"; dimensions.textContent = "—"; outputSize.textContent = "—"; setError(); }
+    imageInput.addEventListener("change", () => chooseFile(imageInput.files[0])); uploadLink.addEventListener("click", () => imageInput.click());
+    ["dragenter", "dragover"].forEach((name) => dropZone.addEventListener(name, (event) => { event.preventDefault(); dropZone.classList.add("dragover"); }));
+    ["dragleave", "drop"].forEach((name) => dropZone.addEventListener(name, (event) => { event.preventDefault(); dropZone.classList.remove("dragover"); }));
+    dropZone.addEventListener("drop", (event) => chooseFile(event.dataTransfer.files[0]));
+    formatButtons.forEach((button) => button.addEventListener("click", () => { outputFormat = button.dataset.format; formatButtons.forEach((item) => item.classList.toggle("active", item === button)); newType.textContent = formatName(outputFormat); qualityGroup.hidden = outputFormat === "image/png"; renderOutput(); }));
+    qualityRange.addEventListener("input", () => { qualityValue.textContent = `${qualityRange.value}%`; renderOutput(); });
+    downloadButton.addEventListener("click", () => { if (!resultBlob || !sourceFile) return; const link = document.createElement("a"); const name = sourceFile.name.replace(/\.[^.]+$/, "") || "converted-image"; link.download = `${name}.${extensionFor(outputFormat)}`; link.href = URL.createObjectURL(resultBlob); link.click(); setTimeout(() => URL.revokeObjectURL(link.href), 1000); });
+    resetButton.addEventListener("click", resetApp);
+  </script>
+</body>
+</html>

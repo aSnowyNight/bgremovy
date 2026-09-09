@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Make a QR code for a link, Discord invite, or message." />
+  <title>QR maker :3 • little image thingies</title>
+  <link rel="stylesheet" href="../assets/css/theme.css" />
+  <style>
+    .page { width:min(100% - 32px,960px); margin:24px auto 58px; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .brand { color:var(--pink); font:700 clamp(1.65rem,4vw,2.2rem)/.9 "Gaegu","Comic Sans MS",cursive; text-decoration:none; letter-spacing:.01em; }
+    .topbar-actions { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:8px; }
+    .discord-link,.back-link,.control-button,.download-button,.reset-button,.preset-button { border:1.5px solid var(--border); border-radius:8px; color:var(--pink-dark); background:transparent; font:700 1rem "Gaegu","Comic Sans MS",cursive; cursor:pointer; text-decoration:none; transition:transform .15s ease,background .15s ease,color .15s ease,box-shadow .15s ease; }
+    .discord-link { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:34px; padding:6px 10px 5px; font:700 .95rem/1 "Gaegu","Comic Sans MS",cursive; white-space:nowrap; }
+    .discord-icon { width:18px; height:18px; display:block; flex:0 0 18px; fill:currentColor; }
+    .discord-link:hover,.back-link:hover,.control-button:hover,.reset-button:hover,.preset-button:hover { background:var(--pink-soft); transform:translateY(-1px); }
+    .discord-link:focus-visible,.back-link:focus-visible,.control-button:focus-visible,.download-button:focus-visible,.reset-button:focus-visible,.preset-button:focus-visible,.content-input:focus-visible { outline:3px solid var(--pink-soft); outline-offset:3px; }
+    .back-link { display:inline-flex; align-items:center; min-height:34px; margin-top:26px; padding:6px 9px; }
+    .hero { margin-top:17px; padding:clamp(24px,5vw,42px); border:1.5px solid var(--pink-soft); border-radius:20px; background:var(--surface); box-shadow:var(--card-shadow); }
+    .eyebrow { width:fit-content; margin:0 0 10px; padding:5px 10px; border:1px solid var(--pink-soft); border-radius:999px; color:var(--pink-dark); background:var(--surface-2); font:700 .95rem "Gaegu","Comic Sans MS",cursive; }
+    h1 { margin:0; color:var(--pink); font:700 clamp(3rem,7vw,4.7rem)/.8 "Gaegu","Comic Sans MS",cursive; letter-spacing:.01em; }
+    .hero-copy { max-width:620px; margin:15px 0 0; color:var(--muted); font-size:1rem; line-height:1.55; }
+    .free-badge { display:inline-block; margin-top:16px; padding:5px 10px; border:1px solid var(--pink-soft); border-radius:999px; color:var(--pink-dark); background:var(--surface-2); font:700 .95rem "Gaegu","Comic Sans MS",cursive; }
+    .workspace { display:grid; grid-template-columns:minmax(0,1fr) minmax(270px,.82fr); gap:15px; margin-top:20px; }
+    .panel { overflow:hidden; border:1.5px solid var(--pink-soft); border-radius:15px; background:var(--surface); box-shadow:var(--card-shadow); }
+    .panel h2 { margin:0; padding:10px 13px; border-bottom:1px solid var(--pink-soft); color:var(--pink-dark); font:700 1.25rem/1 "Gaegu","Comic Sans MS",cursive; }
+    .panel-body { padding:15px; }
+    .control-group { margin-bottom:18px; }
+    .control-group:last-child { margin-bottom:0; }
+    .control-label { display:block; margin-bottom:7px; color:var(--pink-dark); font:700 1.1rem/1 "Gaegu","Comic Sans MS",cursive; }
+    .content-input { width:100%; min-height:142px; resize:vertical; border:1.5px solid var(--pink-soft); border-radius:10px; padding:10px; color:var(--ink); background:var(--surface-2); font:600 .9rem/1.45 "Nunito",system-ui,sans-serif; }
+    .input-note { margin:7px 0 0; color:var(--muted); font-size:.78rem; line-height:1.4; }
+    .preset-row { display:flex; flex-wrap:wrap; gap:7px; }
+    .preset-button { min-height:37px; padding:7px 10px; border-color:var(--pink-soft); background:var(--surface-2); color:var(--pink-dark); font-size:.92rem; }
+    .preset-button.active { border-color:var(--border); background:var(--pink-soft); }
+    .color-row { display:flex; align-items:center; gap:9px; }
+    .color-input { width:44px; height:38px; padding:2px; border:1.5px solid var(--pink-soft); border-radius:8px; background:var(--surface); cursor:pointer; }
+    .color-value { flex:1; min-width:0; border:1.5px solid var(--pink-soft); border-radius:8px; padding:8px 9px; color:var(--ink); background:var(--surface); font:600 .82rem "Nunito",system-ui,sans-serif; }
+    .range-row { display:flex; align-items:center; gap:9px; }
+    input[type="range"] { width:100%; accent-color:var(--pink); }
+    .range-value { min-width:45px; color:var(--pink-dark); text-align:right; font:700 1rem "Gaegu","Comic Sans MS",cursive; }
+    .small-help { margin:7px 0 0; color:var(--muted); font-size:.78rem; line-height:1.4; }
+    .preview-body { display:grid; place-items:center; min-height:425px; padding:22px; background:#f7f1f4; }
+    [data-theme="blackout"] .preview-body { background:#09090b; }
+    .qr-shell { display:grid; place-items:center; width:min(100%,330px); aspect-ratio:1; padding:16px; border-radius:14px; background:#fff; box-shadow:0 5px 17px rgba(0,0,0,.12); }
+    #qrCanvas { display:block; width:100%; height:100%; image-rendering:pixelated; }
+    .empty-qr { color:var(--muted); text-align:center; font:1.15rem/1.25 "Gaegu","Comic Sans MS",cursive; }
+    .action-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:15px; }
+    .download-button { display:inline-flex; align-items:center; justify-content:center; min-height:40px; padding:8px 12px; border-color:var(--pink); background:var(--pink); color:#fff; box-shadow:0 5px 13px var(--shadow); }
+    .download-button:hover { background:var(--pink-dark); transform:translateY(-1px); }
+    [data-theme="blackout"] .download-button { color:#050505; }
+    .reset-button,.control-button { min-height:40px; padding:8px 12px; }
+    .error { min-height:1.25em; margin:12px 0 0; color:#df397c; text-align:center; font-size:.9rem; }
+    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:21px; }
+    .info-card { padding:17px; border:1.5px solid var(--pink-soft); border-radius:15px; background:var(--surface); box-shadow:var(--card-shadow); }
+    .info-card h2 { margin:0 0 6px; color:var(--pink-dark); font:700 1.35rem/1 "Gaegu","Comic Sans MS",cursive; }
+    .info-card p { margin:0; color:var(--muted); font-size:.86rem; line-height:1.48; }
+    footer { margin-top:36px; color:var(--muted); text-align:center; font:400 .92rem/1.45 "Gaegu","Comic Sans MS",cursive; }
+    footer a { color:var(--pink-dark); }
+    @media (max-width:760px) { .workspace { grid-template-columns:1fr; } .preview-body { min-height:330px; } }
+    @media (max-width:620px) { .page { width:min(100% - 24px,960px); margin-top:18px; } .topbar { align-items:flex-start; gap:10px; } .brand { max-width:155px; } .topbar-actions { gap:5px; } .site-mode-toggle { font-size:.85rem; } .discord-link { display:grid; place-items:center; width:34px; height:34px; min-height:34px; padding:0; } .discord-link span { display:none; } .discord-icon { width:17px; height:17px; flex:none; } .hero { padding:25px 20px; } .preview-body { min-height:275px; padding:14px; } .info-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a class="brand" href="../index.html" aria-label="little image thingies home">little image<br>thingies :3</a>
+      <nav class="topbar-actions" aria-label="Site links">
+        <a class="discord-link" href="https://discord.gg/GNhbQbG5cB" target="_blank" rel="noopener noreferrer" aria-label="Join the Discord community" title="join the discord :3"><svg class="discord-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.54 4.64A16.4 16.4 0 0 0 15.49 3.4l-.5 1.02a15.2 15.2 0 0 0-5.98 0l-.5-1.02a16.5 16.5 0 0 0-4.05 1.24C1.9 8.45 1.2 12.18 1.54 15.86a16.3 16.3 0 0 0 4.97 2.5l1.21-1.63a9.45 9.45 0 0 1-1.9-.92l.46-.36c3.67 1.7 7.66 1.7 11.28 0l.46.36c-.61.36-1.25.67-1.91.92l1.21 1.63a16.2 16.2 0 0 0 4.97-2.5c.41-4.27-.7-7.96-2.76-11.22ZM8.68 13.6c-1.1 0-2-1.01-2-2.26s.88-2.26 2-2.26c1.13 0 2.02 1.02 2 2.26 0 1.25-.88 2.26-2 2.26Zm6.64 0c-1.1 0-2-1.01-2-2.26s.88-2.26 2-2.26c1.13 0 2.02 1.02 2 2.26 0 1.25-.87 2.26-2 2.26Z"/></svg><span>discord :3</span></a>
+        <button class="site-mode-toggle" data-site-mode-toggle type="button" aria-pressed="false" aria-label="Switch to professional mode" title="Switch to professional mode">professional mode</button>
+        <div class="theme-picker" aria-label="Choose a color theme"><button class="theme-toggle" data-theme-toggle type="button" aria-expanded="false">themes :3</button><div class="theme-menu" data-theme-menu hidden><button type="button" class="theme-option" data-theme-choice="light">light mode :P</button><button type="button" class="theme-option" data-theme-choice="dark">dark mode :3</button><button type="button" class="theme-option" data-theme-choice="creamsicle">creamsicle :D</button><button type="button" class="theme-option" data-theme-choice="blackout">blackout 0_0</button></div></div>
+      </nav>
+    </header>
+
+    <a class="back-link" href="../index.html">← all tool thingies</a>
+    <section class="hero" aria-labelledby="pageTitle"><p class="eyebrow">little image thingies • browser tool</p><h1 id="pageTitle">QR maker :3</h1><p class="hero-copy">make a QR code for a link, Discord invite, Wi-Fi name, or little message. it stays right in your browser :]</p><span class="free-badge">♡ browser-side • no upload needed</span></section>
+
+    <section class="workspace" aria-label="QR code maker">
+      <article class="panel"><h2>what should it open? :]</h2><div class="panel-body">
+        <div class="control-group"><label class="control-label" for="contentInput">link or text</label><textarea class="content-input" id="contentInput" placeholder="https://example.com"></textarea><p class="input-note">paste a URL, Discord invite, short message, phone number, or any plain text :3</p></div>
+        <div class="control-group"><span class="control-label">quick ideas</span><div class="preset-row"><button class="preset-button" data-example="https://discord.gg/GNhbQbG5cB" type="button">Discord invite</button><button class="preset-button" data-example="https://" type="button">website</button><button class="preset-button" data-example="hello from little image thingies :3" type="button">message</button></div></div>
+        <div class="control-group"><label class="control-label" for="foregroundColor">QR color</label><div class="color-row"><input class="color-input" id="foregroundColor" type="color" value="#262226" /><input class="color-value" id="foregroundValue" type="text" value="#262226" maxlength="7" /></div></div>
+        <div class="control-group"><label class="control-label" for="backgroundColor">background color</label><div class="color-row"><input class="color-input" id="backgroundColor" type="color" value="#ffffff" /><input class="color-value" id="backgroundValue" type="text" value="#ffffff" maxlength="7" /></div></div>
+        <div class="control-group"><label class="control-label" for="sizeRange">download size</label><div class="range-row"><input id="sizeRange" type="range" min="256" max="2048" step="64" value="1024" /><span class="range-value" id="sizeValue">1024 px</span></div><p class="small-help">larger sizes look sharper in print.</p></div>
+        <div class="action-row"><button class="reset-button" id="resetButton" type="button">clear it</button></div>
+      </div></article>
+
+      <article class="panel"><h2>your QR thingy :D</h2><div class="preview-body"><div class="qr-shell" id="qrShell"><p class="empty-qr" id="emptyState">put a link or message in the box<br>and a QR will appear here :]</p><canvas id="qrCanvas" width="1024" height="1024" hidden aria-label="Generated QR code"></canvas></div><p class="error" id="errorMessage" role="alert"></p><div class="action-row"><button class="download-button" id="downloadPng" type="button" disabled>download PNG :D</button><button class="download-button" id="downloadSvg" type="button" disabled>download SVG :3</button></div></div></article>
+    </section>
+
+    <section class="info-grid"><article class="info-card"><h2>tiny tip :]</h2><p>keep the contrast high: a dark QR on a light background is easiest for phone cameras to scan.</p></article><article class="info-card"><h2>quick + private :3</h2><p>your text is turned into a QR code directly in your browser. nothing is sent to a server.</p></article></section>
+    <footer>made with little pixels and a lot of :3 &nbsp;•&nbsp; <a href="https://discord.gg/GNhbQbG5cB" target="_blank" rel="noopener noreferrer">join the Discord</a></footer>
+  </main>
+
+  <script src="../assets/js/theme.js"></script>
+  <script src="../assets/js/site-mode.js"></script>
+  <script>
+    const contentInput = document.getElementById("contentInput");
+    const foregroundColor = document.getElementById("foregroundColor");
+    const foregroundValue = document.getElementById("foregroundValue");
+    const backgroundColor = document.getElementById("backgroundColor");
+    const backgroundValue = document.getElementById("backgroundValue");
+    const sizeRange = document.getElementById("sizeRange");
+    const sizeValue = document.getElementById("sizeValue");
+    const canvas = document.getElementById("qrCanvas");
+    const context = canvas.getContext("2d");
+    const emptyState = document.getElementById("emptyState");
+    const errorMessage = document.getElementById("errorMessage");
+    const downloadPng = document.getElementById("downloadPng");
+    const downloadSvg = document.getElementById("downloadSvg");
+    const resetButton = document.getElementById("resetButton");
+    const presetButtons = document.querySelectorAll("[data-example]");
+    let qrMatrix = null;
+
+    const RS_BLOCK_TABLE = [
+      [1,26,19],[1,26,16],[1,26,13],[1,26,9],
+      [1,44,34],[1,44,28],[1,44,22],[1,44,16],
+      [1,70,55],[1,70,44],[2,35,17],[2,35,13],
+      [1,100,80],[2,50,32],[2,50,24],[4,25,9],
+      [1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],
+      [2,86,68],[4,43,27],[4,43,19],[4,43,15],
+      [2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],
+      [2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],
+      [2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],
+      [2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],
+      [4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],
+      [2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],
+      [4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],
+      [3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],
+      [5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],
+      [5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],
+      [1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],
+      [5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],
+      [3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14]
+    ];
+    const EXP_TABLE = new Array(512), LOG_TABLE = new Array(256);
+    for (let i = 0; i < 8; i++) EXP_TABLE[i] = 1 << i;
+    for (let i = 8; i < 256; i++) EXP_TABLE[i] = EXP_TABLE[i - 4] ^ EXP_TABLE[i - 5] ^ EXP_TABLE[i - 6] ^ EXP_TABLE[i - 8];
+    for (let i = 0; i < 255; i++) LOG_TABLE[EXP_TABLE[i]] = i;
+    for (let i = 255; i < 512; i++) EXP_TABLE[i] = EXP_TABLE[i - 255];
+    const gexp = (n) => EXP_TABLE[n % 255];
+    const glog = (n) => { if (n < 1) throw new Error("glog"); return LOG_TABLE[n]; };
+    class Polynomial { constructor(num, shift) { let offset = 0; while (offset < num.length && num[offset] === 0) offset++; this.num = new Array(num.length - offset + shift).fill(0); for (let i = 0; i < num.length - offset; i++) this.num[i] = num[i + offset]; } get length() { return this.num.length; } get(index) { return this.num[index]; } multiply(other) { const num = new Array(this.length + other.length - 1).fill(0); for (let i = 0; i < this.length; i++) for (let j = 0; j < other.length; j++) num[i + j] ^= gexp(glog(this.get(i)) + glog(other.get(j))); return new Polynomial(num, 0); } mod(other) { if (this.length - other.length < 0) return this; const ratio = glog(this.get(0)) - glog(other.get(0)); const num = this.num.slice(); for (let i = 0; i < other.length; i++) num[i] ^= gexp(glog(other.get(i)) + ratio); return new Polynomial(num, 0).mod(other); } }
+    function getErrorCorrectPolynomial(length) { let a = new Polynomial([1], 0); for (let i = 0; i < length; i++) a = a.multiply(new Polynomial([1, gexp(i)], 0)); return a; }
+    function getRSBlocks(version) { const row = RS_BLOCK_TABLE[(version - 1) * 4 + 0]; const blocks = []; for (let i = 0; i < row.length; i += 3) for (let j = 0; j < row[i]; j++) blocks.push({ totalCount:row[i + 1], dataCount:row[i + 2] }); return blocks; }
+    function utf8Bytes(text) { return Array.from(new TextEncoder().encode(text)); }
+    function chooseVersion(bytes) { for (let version = 1; version <= 10; version++) { const capacity = getRSBlocks(version).reduce((sum, block) => sum + block.dataCount, 0); const countBits = version < 10 ? 8 : 16; if (4 + countBits + bytes.length * 8 <= capacity * 8) return version; } throw new Error("That text is too long for this little QR maker :["); }
+    function createData(version, bytes) { const rsBlocks = getRSBlocks(version); const buffer = []; const put = (value, length) => { for (let i = length - 1; i >= 0; i--) buffer.push((value >>> i) & 1); };
+      put(4, 4); put(bytes.length, version < 10 ? 8 : 16); bytes.forEach((byte) => put(byte, 8));
+      const totalDataCount = rsBlocks.reduce((sum, block) => sum + block.dataCount, 0);
+      for (let i = 0; i < Math.min(4, totalDataCount * 8 - buffer.length); i++) buffer.push(0);
+      while (buffer.length % 8 !== 0) buffer.push(0);
+      const data = []; for (let i = 0; i < buffer.length; i += 8) { let value = 0; for (let j = 0; j < 8; j++) value = (value << 1) | buffer[i + j]; data.push(value); }
+      let pad = 0; while (data.length < totalDataCount) data.push((pad++ % 2) ? 0x11 : 0xec);
+      let offset = 0; const dcdata = [], ecdata = [], maxDc = Math.max(...rsBlocks.map((b) => b.dataCount)), maxEc = Math.max(...rsBlocks.map((b) => b.totalCount - b.dataCount));
+      rsBlocks.forEach((block) => { const dc = data.slice(offset, offset + block.dataCount); offset += block.dataCount; const rs = getErrorCorrectPolynomial(block.totalCount - block.dataCount); const raw = new Polynomial(dc, rs.length - 1); const mod = raw.mod(rs); const ec = new Array(rs.length - 1).fill(0); for (let i = 0; i < ec.length; i++) { const index = i + mod.length - ec.length; if (index >= 0) ec[i] = mod.get(index); } dcdata.push(dc); ecdata.push(ec); });
+      const out = []; for (let i = 0; i < maxDc; i++) dcdata.forEach((block) => { if (i < block.length) out.push(block[i]); }); for (let i = 0; i < maxEc; i++) ecdata.forEach((block) => { if (i < block.length) out.push(block[i]); }); return out;
+    }
+    function bchDigit(data) { let digit = 0; while (data !== 0) { digit++; data >>>= 1; } return digit; }
+    function bchTypeInfo(data) { let d = data << 10; const g = 0x537; while (bchDigit(d) - bchDigit(g) >= 0) d ^= g << (bchDigit(d) - bchDigit(g)); return ((data << 10) | d) ^ 0x5412; }
+    function bchTypeNumber(data) { let d = data << 12; const g = 0x1f25; while (bchDigit(d) - bchDigit(g) >= 0) d ^= g << (bchDigit(d) - bchDigit(g)); return (data << 12) | d; }
+    function maskFunc(i, j) { return (i + j) % 2 === 0; }
+    function makeMatrix(version, data) {
+      const count = version * 4 + 17; const modules = Array.from({ length:count }, () => Array(count).fill(null));
+      function setupPositionProbe(row, col) { for (let r = -1; r <= 7; r++) for (let c = -1; c <= 7; c++) if (row + r >= 0 && row + r < count && col + c >= 0 && col + c < count) modules[row + r][col + c] = (r >= 0 && r <= 6 && (c === 0 || c === 6) || c >= 0 && c <= 6 && (r === 0 || r === 6) || r >= 2 && r <= 4 && c >= 2 && c <= 4);
+      }
+      setupPositionProbe(0, 0); setupPositionProbe(count - 7, 0); setupPositionProbe(0, count - 7);
+      for (let r = 8; r < count - 8; r++) if (modules[r][6] === null) modules[r][6] = r % 2 === 0;
+      for (let c = 8; c < count - 8; c++) if (modules[6][c] === null) modules[6][c] = c % 2 === 0;
+      if (version > 1) { const pos = [6, 18, 22, 26, 30, 34, 38, 42, 46, 50][version - 2]; for (const row of [6, pos]) for (const col of [6, pos]) if (modules[row][col] === null) for (let r = -2; r <= 2; r++) for (let c = -2; c <= 2; c++) modules[row + r][col + c] = Math.max(Math.abs(r), Math.abs(c)) !== 1; }
+      const bits = bchTypeInfo(0); for (let i = 0; i < 15; i++) { const bit = ((bits >>> i) & 1) === 1; if (i < 6) modules[i][8] = bit; else if (i < 8) modules[i + 1][8] = bit; else modules[count - 15 + i][8] = bit; if (i < 8) modules[8][count - i - 1] = bit; else if (i < 9) modules[8][15 - i] = bit; else modules[8][15 - i - 1] = bit; }
+      modules[count - 8][8] = true;
+      let row = count - 1, direction = -1, byteIndex = 0, bitIndex = 7;
+      for (let col = count - 1; col > 0; col -= 2) { if (col === 6) col--; while (true) { for (let c = 0; c < 2; c++) if (modules[row][col - c] === null) { let dark = false; if (byteIndex < data.length) dark = ((data[byteIndex] >>> bitIndex) & 1) === 1; if (maskFunc(row, col - c)) dark = !dark; modules[row][col - c] = dark; bitIndex--; if (bitIndex === -1) { byteIndex++; bitIndex = 7; } } row += direction; if (row < 0 || row >= count) { row -= direction; direction = -direction; break; } } }
+      return modules;
+    }
+    function drawQr() {
+      const text = contentInput.value.trim();
+      errorMessage.textContent = "";
+      if (!text) { qrMatrix = null; canvas.hidden = true; emptyState.hidden = false; downloadPng.disabled = true; downloadSvg.disabled = true; return; }
+      try {
+        const bytes = utf8Bytes(text); const version = chooseVersion(bytes); qrMatrix = makeMatrix(version, createData(version, bytes)); const size = Number(sizeRange.value); canvas.width = size; canvas.height = size; const moduleSize = size / qrMatrix.length; context.fillStyle = backgroundColor.value; context.fillRect(0, 0, size, size); context.fillStyle = foregroundColor.value; qrMatrix.forEach((row, y) => row.forEach((dark, x) => { if (dark) context.fillRect(Math.round(x * moduleSize), Math.round(y * moduleSize), Math.ceil(moduleSize), Math.ceil(moduleSize)); })); canvas.hidden = false; emptyState.hidden = true; downloadPng.disabled = false; downloadSvg.disabled = false;
+      } catch (error) { qrMatrix = null; canvas.hidden = true; emptyState.hidden = false; downloadPng.disabled = true; downloadSvg.disabled = true; errorMessage.textContent = error.message || "could not make that QR :["; }
+    }
+    function setColor(input, valueInput) { input.addEventListener("input", () => { valueInput.value = input.value; drawQr(); }); valueInput.addEventListener("change", () => { if (/^#[0-9a-fA-F]{6}$/.test(valueInput.value)) { input.value = valueInput.value; drawQr(); } else valueInput.value = input.value; }); }
+    function downloadCanvas() { if (!qrMatrix) return; const link = document.createElement("a"); link.download = "little-qr-code.png"; link.href = canvas.toDataURL("image/png"); link.click(); }
+    function downloadSvgFile() { if (!qrMatrix) return; const cells = []; qrMatrix.forEach((row, y) => row.forEach((dark, x) => { if (dark) cells.push(`M${x} ${y}h1v1H${x}z`); })); const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${qrMatrix.length} ${qrMatrix.length}" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="${backgroundColor.value}"/><path fill="${foregroundColor.value}" d="${cells.join("")}"/></svg>`; const link = document.createElement("a"); link.download = "little-qr-code.svg"; link.href = URL.createObjectURL(new Blob([svg], { type:"image/svg+xml" })); link.click(); setTimeout(() => URL.revokeObjectURL(link.href), 1000); }
+    contentInput.addEventListener("input", drawQr); sizeRange.addEventListener("input", () => { sizeValue.textContent = `${sizeRange.value} px`; drawQr(); }); setColor(foregroundColor, foregroundValue); setColor(backgroundColor, backgroundValue);
+    presetButtons.forEach((button) => button.addEventListener("click", () => { contentInput.value = button.dataset.example; contentInput.focus(); drawQr(); }));
+    downloadPng.addEventListener("click", downloadCanvas); downloadSvg.addEventListener("click", downloadSvgFile); resetButton.addEventListener("click", () => { contentInput.value = ""; foregroundColor.value = "#262226"; foregroundValue.value = "#262226"; backgroundColor.value = "#ffffff"; backgroundValue.value = "#ffffff"; sizeRange.value = 1024; sizeValue.textContent = "1024 px"; drawQr(); contentInput.focus(); });
+  </script>
+</body>
+</html>

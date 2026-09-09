@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Resize and crop images with little image thingies." />
+  <title>resize + crop :3 • little image thingies</title>
+  <link rel="stylesheet" href="../assets/css/theme.css" />
+  <style>
+    .page { width:min(100% - 32px,960px); margin:24px auto 58px; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .brand { color:var(--pink); font:700 clamp(1.65rem,4vw,2.2rem)/.9 "Gaegu","Comic Sans MS",cursive; text-decoration:none; letter-spacing:.01em; }
+    .topbar-actions { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:8px; }
+    .discord-link,.back-link,.choose-button,.control-button,.download-button,.reset-button,.ratio-button { border:1.5px solid var(--border); border-radius:8px; color:var(--pink-dark); background:transparent; font:700 1rem "Gaegu","Comic Sans MS",cursive; cursor:pointer; text-decoration:none; transition:transform .15s ease,background .15s ease,color .15s ease,box-shadow .15s ease; }
+    .discord-link { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:34px; padding:6px 10px 5px; font:700 .95rem/1 "Gaegu","Comic Sans MS",cursive; white-space:nowrap; }
+    .discord-icon { width:18px; height:18px; display:block; flex:0 0 18px; fill:currentColor; }
+    .discord-link:hover,.back-link:hover,.choose-button:hover,.control-button:hover,.reset-button:hover,.ratio-button:hover { background:var(--pink-soft); transform:translateY(-1px); }
+    .discord-link:focus-visible,.back-link:focus-visible,.choose-button:focus-visible,.control-button:focus-visible,.download-button:focus-visible,.reset-button:focus-visible,.ratio-button:focus-visible { outline:3px solid var(--pink-soft); outline-offset:3px; }
+    .back-link { display:inline-flex; align-items:center; min-height:34px; margin-top:26px; padding:6px 9px; }
+    .hero { margin-top:17px; padding:clamp(24px,5vw,42px); border:1.5px solid var(--pink-soft); border-radius:20px; background:var(--surface); box-shadow:var(--card-shadow); }
+    .eyebrow { width:fit-content; margin:0 0 10px; padding:5px 10px; border:1px solid var(--pink-soft); border-radius:999px; color:var(--pink-dark); background:var(--surface-2); font:700 .95rem "Gaegu","Comic Sans MS",cursive; }
+    h1 { margin:0; color:var(--pink); font:700 clamp(3rem,7vw,4.7rem)/.8 "Gaegu","Comic Sans MS",cursive; letter-spacing:.01em; }
+    .hero-copy { max-width:620px; margin:15px 0 0; color:var(--muted); font-size:1rem; line-height:1.55; }
+    .free-badge { display:inline-block; margin-top:16px; padding:5px 10px; border:1px solid var(--pink-soft); border-radius:999px; color:var(--pink-dark); background:var(--surface-2); font:700 .95rem "Gaegu","Comic Sans MS",cursive; }
+    .upload-card { min-height:178px; display:grid; place-items:center; margin-top:20px; border:2px dashed var(--border); border-radius:15px; padding:28px; background:var(--surface); text-align:center; cursor:pointer; transition:background .15s ease,transform .15s ease,box-shadow .15s ease; }
+    .upload-card:hover,.upload-card.dragover { background:var(--pink-soft); box-shadow:0 8px 26px var(--shadow); transform:translateY(-2px); }
+    .upload-icon { display:grid; place-items:center; width:53px; height:53px; margin:0 auto 8px; border:1px solid var(--pink-soft); border-radius:16px; color:var(--pink-dark); background:var(--surface-2); font:700 2.3rem/1 "Gaegu","Comic Sans MS",cursive; }
+    .upload-card p { margin:0 0 12px; color:var(--pink); font:700 1.3rem "Gaegu","Comic Sans MS",cursive; }
+    .choose-button { display:inline-block; padding:6px 12px; }
+    input[type="file"] { display:none; }
+    .upload-link { display:block; width:fit-content; margin:12px auto 0; border:0; padding:0; color:var(--pink); background:transparent; text-decoration:underline; text-underline-offset:3px; font:700 1rem "Gaegu","Comic Sans MS",cursive; cursor:pointer; }
+    .tip { margin:7px 0 0; color:var(--muted); text-align:center; font:400 .92rem "Gaegu","Comic Sans MS",cursive; }
+    .error { min-height:1.25em; margin:12px 0 0; color:#df397c; text-align:center; font-size:.9rem; }
+    .editor { display:none; grid-template-columns:minmax(0,1.25fr) minmax(265px,.75fr); gap:15px; margin-top:20px; }
+    .editor.visible { display:grid; }
+    .preview-card,.controls-card { overflow:hidden; border:1.5px solid var(--pink-soft); border-radius:15px; background:var(--surface); box-shadow:var(--card-shadow); }
+    .preview-card h2,.controls-card h2 { margin:0; padding:10px 13px; border-bottom:1px solid var(--pink-soft); color:var(--pink-dark); font:700 1.25rem/1 "Gaegu","Comic Sans MS",cursive; }
+    .canvas-wrap { position:relative; display:grid; place-items:center; min-height:350px; padding:13px; overflow:hidden; background:#eee9ed; }
+    [data-theme="blackout"] .canvas-wrap { background:#09090b; }
+    #previewCanvas { display:block; max-width:100%; max-height:540px; border-radius:7px; box-shadow:0 4px 15px rgba(0,0,0,.14); touch-action:none; cursor:grab; }
+    #previewCanvas.dragging { cursor:grabbing; }
+    .controls-body { padding:14px; }
+    .control-group { margin-bottom:17px; }
+    .control-group:last-child { margin-bottom:0; }
+    .control-label { display:block; margin-bottom:7px; color:var(--pink-dark); font:700 1.1rem/1 "Gaegu","Comic Sans MS",cursive; }
+    .ratio-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; }
+    .ratio-button { min-height:37px; padding:6px 4px; border-color:var(--pink-soft); color:var(--ink); background:var(--surface-2); font-size:.9rem; }
+    .ratio-button.active { border-color:var(--border); background:var(--pink-soft); color:var(--pink-dark); }
+    .dimension-grid { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:7px; }
+    .dimension-input { width:100%; min-width:0; border:1.5px solid var(--pink-soft); border-radius:8px; padding:8px 9px; color:var(--ink); background:var(--surface); font:600 .87rem "Nunito",system-ui,sans-serif; }
+    .dimension-input:focus { outline:2px solid var(--pink-soft); border-color:var(--border); }
+    .dimension-x { color:var(--pink-dark); font:700 1.1rem "Gaegu","Comic Sans MS",cursive; }
+    .lock-row,.range-row,.action-row { display:flex; align-items:center; gap:8px; }
+    .lock-row { margin-top:9px; }
+    .lock-row input { width:16px; height:16px; accent-color:var(--pink); }
+    .lock-row label { color:var(--muted); font-size:.82rem; }
+    .range-row input[type="range"] { width:100%; accent-color:var(--pink); }
+    .range-value { min-width:43px; color:var(--pink-dark); text-align:right; font:700 1rem "Gaegu","Comic Sans MS",cursive; }
+    .control-button,.reset-button { min-height:40px; padding:8px 12px; }
+    .download-button { display:inline-flex; align-items:center; justify-content:center; min-height:40px; padding:8px 12px; border-color:var(--pink); background:var(--pink); color:#fff; box-shadow:0 5px 13px var(--shadow); }
+    .download-button:hover { background:var(--pink-dark); transform:translateY(-1px); }
+    [data-theme="blackout"] .download-button { color:#050505; }
+    .small-help { margin:7px 0 0; color:var(--muted); font-size:.77rem; line-height:1.35; }
+    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:21px; }
+    .info-card { padding:17px; border:1.5px solid var(--pink-soft); border-radius:15px; background:var(--surface); box-shadow:var(--card-shadow); }
+    .info-card h2 { margin:0 0 6px; color:var(--pink-dark); font:700 1.35rem/1 "Gaegu","Comic Sans MS",cursive; }
+    .info-card p { margin:0; color:var(--muted); font-size:.86rem; line-height:1.48; }
+    footer { margin-top:36px; color:var(--muted); text-align:center; font:400 .92rem/1.45 "Gaegu","Comic Sans MS",cursive; }
+    footer a { color:var(--pink-dark); }
+    @media (max-width:760px) { .editor { grid-template-columns:1fr; } .canvas-wrap { min-height:290px; } }
+    @media (max-width:620px) { .page { width:min(100% - 24px,960px); margin-top:18px; } .topbar { align-items:flex-start; gap:10px; } .brand { max-width:155px; } .topbar-actions { gap:5px; } .site-mode-toggle { font-size:.85rem; } .discord-link { display:grid; place-items:center; width:34px; height:34px; min-height:34px; padding:0; } .discord-link span { display:none; } .discord-icon { width:17px; height:17px; flex:none; } .hero { padding:25px 20px; } .canvas-wrap { min-height:235px; padding:8px; } .info-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a class="brand" href="../index.html" aria-label="little image thingies home">little image<br>thingies :3</a>
+      <nav class="topbar-actions" aria-label="Site links">
+        <a class="discord-link" href="https://discord.gg/GNhbQbG5cB" target="_blank" rel="noopener noreferrer" aria-label="Join the Discord community" title="join the discord :3"><svg class="discord-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.54 4.64A16.4 16.4 0 0 0 15.49 3.4l-.5 1.02a15.2 15.2 0 0 0-5.98 0l-.5-1.02a16.5 16.5 0 0 0-4.05 1.24C1.9 8.45 1.2 12.18 1.54 15.86a16.3 16.3 0 0 0 4.97 2.5l1.21-1.63a9.45 9.45 0 0 1-1.9-.92l.46-.36c3.67 1.7 7.66 1.7 11.28 0l.46.36c-.61.36-1.25.67-1.91.92l1.21 1.63a16.2 16.2 0 0 0 4.97-2.5c.41-4.27-.7-7.96-2.76-11.22ZM8.68 13.6c-1.1 0-2-1.01-2-2.26s.88-2.26 2-2.26c1.13 0 2.02 1.02 2 2.26 0 1.25-.88 2.26-2 2.26Zm6.64 0c-1.1 0-2-1.01-2-2.26s.88-2.26 2-2.26c1.13 0 2.02 1.02 2 2.26 0 1.25-.87 2.26-2 2.26Z"/></svg><span>discord :3</span></a>
+        <button class="site-mode-toggle" data-site-mode-toggle type="button" aria-pressed="false" aria-label="Switch to professional mode" title="Switch to professional mode">professional mode</button>
+        <div class="theme-picker" aria-label="Choose a color theme">
+          <button class="theme-toggle" data-theme-toggle type="button" aria-expanded="false">themes :3</button>
+          <div class="theme-menu" data-theme-menu hidden>
+            <button type="button" class="theme-option" data-theme-choice="light">light mode :P</button>
+            <button type="button" class="theme-option" data-theme-choice="dark">dark mode :3</button>
+            <button type="button" class="theme-option" data-theme-choice="creamsicle">creamsicle :D</button>
+            <button type="button" class="theme-option" data-theme-choice="blackout">blackout 0_0</button>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <a class="back-link" href="../index.html">← all tool thingies</a>
+
+    <section class="hero" aria-labelledby="pageTitle">
+      <p class="eyebrow">little image thingies • browser tool</p>
+      <h1 id="pageTitle">resize + crop :3</h1>
+      <p class="hero-copy">crop an image, pick an exact size, and download it ready for wherever it needs to go. drag the picture in the preview to choose what stays in the frame :]</p>
+      <span class="free-badge">♡ browser-side • no upload needed</span>
+    </section>
+
+    <label class="upload-card" id="dropZone" for="imageInput"><div><span class="upload-icon" aria-hidden="true">↑</span><p>put image here :P</p><span class="choose-button">choose image :3</span></div></label>
+    <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" />
+    <button class="upload-link" id="uploadLink" type="button">or upload an image :]</button>
+    <p class="tip">PNG, JPG, and WebP up to 15 MB :3</p>
+    <p class="error" id="errorMessage" role="alert"></p>
+
+    <section class="editor" id="editor" aria-label="Resize and crop editor">
+      <article class="preview-card"><h2>your crop :D</h2><div class="canvas-wrap"><canvas id="previewCanvas" width="1200" height="1200" aria-label="Crop preview"></canvas></div></article>
+      <aside class="controls-card">
+        <h2>make it fit :3</h2>
+        <div class="controls-body">
+          <div class="control-group"><span class="control-label">crop shape</span><div class="ratio-grid"><button class="ratio-button active" data-ratio="free" type="button">free</button><button class="ratio-button" data-ratio="1:1" type="button">1 : 1</button><button class="ratio-button" data-ratio="4:5" type="button">4 : 5</button><button class="ratio-button" data-ratio="16:9" type="button">16 : 9</button><button class="ratio-button" data-ratio="9:16" type="button">9 : 16</button><button class="ratio-button" data-ratio="3:2" type="button">3 : 2</button></div><p class="small-help">choose a preset, or use free for any width and height.</p></div>
+          <div class="control-group"><span class="control-label">final size</span><div class="dimension-grid"><input class="dimension-input" id="widthInput" type="number" min="1" max="4096" value="1200" inputmode="numeric" aria-label="Output width in pixels" /><span class="dimension-x">×</span><input class="dimension-input" id="heightInput" type="number" min="1" max="4096" value="1200" inputmode="numeric" aria-label="Output height in pixels" /></div><div class="lock-row"><input id="lockRatio" type="checkbox" checked /><label for="lockRatio">keep crop shape when changing size</label></div><p class="small-help">output is limited to 4096 px on either side to keep things smooth.</p></div>
+          <div class="control-group"><label class="control-label" for="zoomRange">image zoom</label><div class="range-row"><input id="zoomRange" type="range" min="20" max="350" value="100" /><span class="range-value" id="zoomValue">100%</span></div><p class="small-help">drag the image directly in the preview to move it around :]</p></div>
+          <div class="control-group"><span class="control-label">turn it</span><div class="action-row"><button class="control-button" id="rotateLeft" type="button">↶ left</button><button class="control-button" id="rotateRight" type="button">right ↷</button></div></div>
+          <div class="control-group"><span class="control-label">download</span><div class="action-row"><button class="download-button" id="downloadPng" type="button">download PNG :D</button><button class="download-button" id="downloadJpg" type="button">download JPG :]</button><button class="download-button" id="downloadWebp" type="button">download WebP :3</button></div><p class="small-help">PNG is best for transparent images. JPG is usually smaller.</p></div>
+          <div class="control-group"><button class="reset-button" id="resetButton" type="button">start over</button></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="info-grid"><article class="info-card"><h2>easy crop :]</h2><p>use a preset for profile pictures, reels, posts, banners, or any custom dimensions you need. the preview is exactly what gets downloaded.</p></article><article class="info-card"><h2>quick + private :3</h2><p>your image is resized and cropped directly in your browser. it stays on your device while you edit it.</p></article></section>
+    <footer>made with little pixels and a lot of :3 &nbsp;•&nbsp; <a href="https://discord.gg/GNhbQbG5cB" target="_blank" rel="noopener noreferrer">join the Discord</a></footer>
+  </main>
+
+  <script src="../assets/js/theme.js"></script>
+  <script src="../assets/js/site-mode.js"></script>
+  <script>
+    const MAX_FILE_SIZE = 15 * 1024 * 1024;
+    const MAX_OUTPUT_SIZE = 4096;
+    const imageInput = document.getElementById("imageInput");
+    const dropZone = document.getElementById("dropZone");
+    const uploadLink = document.getElementById("uploadLink");
+    const editor = document.getElementById("editor");
+    const errorMessage = document.getElementById("errorMessage");
+    const canvas = document.getElementById("previewCanvas");
+    const ctx = canvas.getContext("2d");
+    const ratioButtons = document.querySelectorAll("[data-ratio]");
+    const widthInput = document.getElementById("widthInput");
+    const heightInput = document.getElementById("heightInput");
+    const lockRatio = document.getElementById("lockRatio");
+    const zoomRange = document.getElementById("zoomRange");
+    const zoomValue = document.getElementById("zoomValue");
+    const rotateLeft = document.getElementById("rotateLeft");
+    const rotateRight = document.getElementById("rotateRight");
+    const downloadPng = document.getElementById("downloadPng");
+    const downloadJpg = document.getElementById("downloadJpg");
+    const downloadWebp = document.getElementById("downloadWebp");
+    const resetButton = document.getElementById("resetButton");
+    let sourceImage = null, outputWidth = 1200, outputHeight = 1200, selectedRatio = "free", zoom = 1, offsetX = 0, offsetY = 0, rotation = 0, dragging = false, dragStart = null;
+
+    function setError(message = "") { errorMessage.textContent = message; }
+    function clamp(value, min, max) { return Math.min(Math.max(value, min), max); }
+    function validOutputSize(value, fallback) { const number = Math.floor(Number(value)); return Number.isFinite(number) ? clamp(number, 1, MAX_OUTPUT_SIZE) : fallback; }
+    function getRatioValue(name) { if (name === "free") return null; const [width, height] = name.split(":").map(Number); return width / height; }
+    function updateInputs() { widthInput.value = outputWidth; heightInput.value = outputHeight; }
+    function setOutputSize(width, height, keepPosition = false) { outputWidth = validOutputSize(width, outputWidth); outputHeight = validOutputSize(height, outputHeight); canvas.width = outputWidth; canvas.height = outputHeight; updateInputs(); if (!keepPosition) { offsetX = 0; offsetY = 0; } render(); }
+    function loadImage(file) { return new Promise((resolve, reject) => { const url = URL.createObjectURL(file), image = new Image(); image.onload = () => { URL.revokeObjectURL(url); resolve(image); }; image.onerror = () => { URL.revokeObjectURL(url); reject(new Error("could not read that image :[")); }; image.src = url; }); }
+    function getRotatedDimensions(image, degrees) { return Math.abs(degrees % 180) === 90 ? { width:image.naturalHeight, height:image.naturalWidth } : { width:image.naturalWidth, height:image.naturalHeight }; }
+    function getImageDrawValues() { const rotated = getRotatedDimensions(sourceImage, rotation); const scale = Math.max(outputWidth / rotated.width, outputHeight / rotated.height) * zoom; return { width:sourceImage.naturalWidth * scale, height:sourceImage.naturalHeight * scale }; }
+    function render() { if (!sourceImage) return; ctx.clearRect(0, 0, canvas.width, canvas.height); const size = getImageDrawValues(); ctx.save(); ctx.translate(canvas.width / 2 + offsetX, canvas.height / 2 + offsetY); ctx.rotate((rotation * Math.PI) / 180); ctx.drawImage(sourceImage, -size.width / 2, -size.height / 2, size.width, size.height); ctx.restore(); }
+    async function chooseImage(file) { setError(); if (!file) return; if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) return setError("please choose a PNG, JPG, or WebP image :["); if (file.size > MAX_FILE_SIZE) return setError("that image is over 15 MB—please pick a smaller one :["); try { sourceImage = await loadImage(file); selectedRatio = "free"; ratioButtons.forEach((button) => button.classList.toggle("active", button.dataset.ratio === "free")); zoom = 1; offsetX = 0; offsetY = 0; rotation = 0; zoomRange.value = 100; zoomValue.textContent = "100%"; setOutputSize(Math.max(1, Math.min(sourceImage.naturalWidth, 1200)), Math.max(1, Math.min(sourceImage.naturalHeight, 1200))); editor.classList.add("visible"); } catch (error) { setError(error.message); } }
+    function applyRatio(name) { if (!sourceImage) return; selectedRatio = name; ratioButtons.forEach((button) => button.classList.toggle("active", button.dataset.ratio === name)); const ratio = getRatioValue(name); if (ratio) setOutputSize(outputWidth, Math.max(1, Math.round(outputWidth / ratio))); }
+    function syncFromWidth() { const width = validOutputSize(widthInput.value, outputWidth); if (lockRatio.checked && selectedRatio !== "free") setOutputSize(width, Math.round(width / getRatioValue(selectedRatio)), true); else setOutputSize(width, outputHeight, true); }
+    function syncFromHeight() { const height = validOutputSize(heightInput.value, outputHeight); if (lockRatio.checked && selectedRatio !== "free") setOutputSize(Math.round(height * getRatioValue(selectedRatio)), height, true); else setOutputSize(outputWidth, height, true); }
+    function point(event) { const rect = canvas.getBoundingClientRect(); return { x:(event.clientX - rect.left) * (canvas.width / rect.width), y:(event.clientY - rect.top) * (canvas.height / rect.height) }; }
+    function stopDrag() { dragging = false; dragStart = null; canvas.classList.remove("dragging"); }
+    function download(type, extension) { if (!sourceImage) return; const link = document.createElement("a"); link.download = `resized-image.${extension}`; link.href = canvas.toDataURL(type, type === "image/jpeg" ? .92 : undefined); link.click(); }
+    function resetApp() { sourceImage = null; imageInput.value = ""; editor.classList.remove("visible"); selectedRatio = "free"; zoom = 1; offsetX = 0; offsetY = 0; rotation = 0; canvas.width = 1200; canvas.height = 1200; ctx.clearRect(0, 0, canvas.width, canvas.height); widthInput.value = 1200; heightInput.value = 1200; zoomRange.value = 100; zoomValue.textContent = "100%"; ratioButtons.forEach((button) => button.classList.toggle("active", button.dataset.ratio === "free")); setError(); }
+    imageInput.addEventListener("change", () => chooseImage(imageInput.files[0])); uploadLink.addEventListener("click", () => imageInput.click());
+    ["dragenter", "dragover"].forEach((name) => dropZone.addEventListener(name, (event) => { event.preventDefault(); dropZone.classList.add("dragover"); }));
+    ["dragleave", "drop"].forEach((name) => dropZone.addEventListener(name, (event) => { event.preventDefault(); dropZone.classList.remove("dragover"); }));
+    dropZone.addEventListener("drop", (event) => chooseImage(event.dataTransfer.files[0])); ratioButtons.forEach((button) => button.addEventListener("click", () => applyRatio(button.dataset.ratio))); widthInput.addEventListener("change", syncFromWidth); heightInput.addEventListener("change", syncFromHeight);
+    zoomRange.addEventListener("input", () => { zoom = Number(zoomRange.value) / 100; zoomValue.textContent = `${zoomRange.value}%`; render(); });
+    rotateLeft.addEventListener("click", () => { if (!sourceImage) return; rotation = (rotation + 270) % 360; offsetX = 0; offsetY = 0; render(); }); rotateRight.addEventListener("click", () => { if (!sourceImage) return; rotation = (rotation + 90) % 360; offsetX = 0; offsetY = 0; render(); });
+    canvas.addEventListener("pointerdown", (event) => { if (!sourceImage) return; dragging = true; canvas.classList.add("dragging"); canvas.setPointerCapture(event.pointerId); dragStart = { ...point(event), offsetX, offsetY }; });
+    canvas.addEventListener("pointermove", (event) => { if (!dragging || !dragStart) return; const current = point(event); offsetX = dragStart.offsetX + (current.x - dragStart.x); offsetY = dragStart.offsetY + (current.y - dragStart.y); render(); });
+    canvas.addEventListener("pointerup", stopDrag); canvas.addEventListener("pointercancel", stopDrag); canvas.addEventListener("lostpointercapture", stopDrag);
+    downloadPng.addEventListener("click", () => download("image/png", "png")); downloadJpg.addEventListener("click", () => download("image/jpeg", "jpg")); downloadWebp.addEventListener("click", () => download("image/webp", "webp")); resetButton.addEventListener("click", resetApp);
+  </script>
+</body>
+</html>
