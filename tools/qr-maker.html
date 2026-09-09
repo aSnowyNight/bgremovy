@@ -283,6 +283,15 @@
     drawQr();
     contentInput.focus();
   });
+      })
+  .catch(() => {
+    const errorMessage = document.getElementById("errorMessage");
+
+    if (errorMessage) {
+      errorMessage.textContent =
+        "the QR library could not load. please check your connection or try again :[";
+    }
+  });
 </script>
 </body>
 </html>
