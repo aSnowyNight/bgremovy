@@ -26,6 +26,8 @@
     .theme-menu { position:absolute; z-index:10; top:calc(100% + 7px); right:0; width:142px; padding:6px; border:1.5px solid var(--pink-soft); border-radius:11px; background:var(--surface); box-shadow:0 10px 25px var(--shadow); }
     .theme-option { display:block; width:100%; border:0; border-radius:7px; padding:7px 8px; color:var(--pink-dark); background:transparent; text-align:left; font:700 1rem "Gaegu","Comic Sans MS",cursive; cursor:pointer; }
     .theme-option:hover,.theme-option[aria-current="true"] { background:var(--pink-soft); }
+
+    /* The icon uses a balanced 24x24 artwork and an exact square mobile button. */
     .discord-link { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:34px; padding:6px 10px 5px; font:700 .95rem/1 "Gaegu","Comic Sans MS",cursive; line-height:1; white-space:nowrap; }
     .discord-icon { width:18px; height:18px; display:block; flex:0 0 18px; fill:currentColor; transform:none; }
     .theme-toggle:hover,.discord-link:hover { background:var(--pink-soft); transform:translateY(-1px); }
@@ -46,12 +48,39 @@
     .tool-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
     .tool-card { position:relative; min-height:200px; display:flex; flex-direction:column; align-items:flex-start; padding:18px; overflow:hidden; border:1.5px solid var(--pink-soft); border-radius:16px; color:var(--ink); background:var(--surface); box-shadow:var(--card-shadow); text-decoration:none; transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease; }
     .tool-card:hover { border-color:var(--border); box-shadow:0 14px 31px var(--shadow); transform:translateY(-4px); }
-    .tool-card.coming-soon { cursor:default; opacity:.86; }.tool-card.coming-soon:hover { border-color:var(--pink-soft); box-shadow:var(--card-shadow); transform:none; }
+    .tool-card.coming-soon { cursor:default; opacity:.86; }
+    .tool-card.coming-soon:hover { border-color:var(--pink-soft); box-shadow:var(--card-shadow); transform:none; }
     .tool-icon { width:48px; height:48px; display:grid; place-items:center; margin-bottom:12px; border:1px solid var(--pink-soft); border-radius:14px; color:var(--pink-dark); background:var(--surface-2); font:700 2rem/1 "Gaegu","Comic Sans MS",cursive; }
-    .tool-card h3 { margin:0; color:var(--pink-dark); font:700 1.45rem/1 "Gaegu","Comic Sans MS",cursive; }.tool-card p { margin:7px 0 0; color:var(--muted); font-size:.88rem; line-height:1.42; }.tool-tag { margin-top:auto; padding-top:14px; color:var(--pink-dark); font:700 .92rem "Gaegu","Comic Sans MS",cursive; }.tool-tag.ai { color:#b66f00; }[data-theme="dark"] .tool-tag.ai { color:#ffc36a; }[data-theme="creamsicle"] .tool-tag.ai { color:#a84b0c; }
-    .info-grid { display:grid; grid-template-columns:1.2fr .8fr; gap:14px; }.info-card { padding:20px; border:1.5px solid var(--pink-soft); border-radius:16px; background:var(--surface); box-shadow:var(--card-shadow); }.info-card h3 { margin:0 0 7px; color:var(--pink-dark); font:700 1.45rem/1 "Gaegu","Comic Sans MS",cursive; }.info-card p { margin:0; color:var(--muted); font-size:.9rem; line-height:1.5; }.support-button { display:inline-flex; align-items:center; justify-content:center; min-height:38px; margin-top:13px; padding:8px 13px; }footer { margin-top:38px; color:var(--muted); text-align:center; font:400 .92rem/1.45 "Gaegu","Comic Sans MS",cursive; }footer a { color:var(--pink-dark); }
-    @media (max-width:760px) { .tool-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }.info-grid { grid-template-columns:1fr; } }
-    @media (max-width:560px) { .page { width:min(100% - 24px,960px); margin-top:18px; }.topbar { align-items:flex-start; gap:10px; }.brand { max-width:155px; }.topbar-actions { gap:5px; }.theme-toggle { font-size:.85rem; }.discord-link { display:grid; place-items:center; width:34px; height:34px; min-height:34px; padding:0; }.discord-link span { display:none; }.discord-icon { width:17px; height:17px; flex:none; }.hero { margin-top:28px; border-radius:18px; }.hero::after { right:13px; bottom:12px; font-size:1.5rem; }.tool-grid { grid-template-columns:1fr; }.tool-card { min-height:170px; }.section-heading { align-items:flex-start; flex-direction:column; gap:3px; }.section-note { text-align:left; } }
+    .tool-card h3 { margin:0; color:var(--pink-dark); font:700 1.45rem/1 "Gaegu","Comic Sans MS",cursive; }
+    .tool-card p { margin:7px 0 0; color:var(--muted); font-size:.88rem; line-height:1.42; }
+    .tool-tag { margin-top:auto; padding-top:14px; color:var(--pink-dark); font:700 .92rem "Gaegu","Comic Sans MS",cursive; }
+    .tool-tag.ai { color:#b66f00; }
+    [data-theme="dark"] .tool-tag.ai { color:#ffc36a; }
+    [data-theme="creamsicle"] .tool-tag.ai { color:#a84b0c; }
+    .info-grid { display:grid; grid-template-columns:1.2fr .8fr; gap:14px; }
+    .info-card { padding:20px; border:1.5px solid var(--pink-soft); border-radius:16px; background:var(--surface); box-shadow:var(--card-shadow); }
+    .info-card h3 { margin:0 0 7px; color:var(--pink-dark); font:700 1.45rem/1 "Gaegu","Comic Sans MS",cursive; }
+    .info-card p { margin:0; color:var(--muted); font-size:.9rem; line-height:1.5; }
+    .support-button { display:inline-flex; align-items:center; justify-content:center; min-height:38px; margin-top:13px; padding:8px 13px; }
+    footer { margin-top:38px; color:var(--muted); text-align:center; font:400 .92rem/1.45 "Gaegu","Comic Sans MS",cursive; }
+    footer a { color:var(--pink-dark); }
+    @media (max-width:760px) { .tool-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .info-grid { grid-template-columns:1fr; } }
+    @media (max-width:560px) {
+      .page { width:min(100% - 24px,960px); margin-top:18px; }
+      .topbar { align-items:flex-start; gap:10px; }
+      .brand { max-width:155px; }
+      .topbar-actions { gap:5px; }
+      .theme-toggle { font-size:.85rem; }
+      .discord-link { display:grid; place-items:center; width:34px; height:34px; min-height:34px; padding:0; }
+      .discord-link span { display:none; }
+      .discord-icon { width:17px; height:17px; flex:none; transform:none; }
+      .hero { margin-top:28px; border-radius:18px; }
+      .hero::after { right:13px; bottom:12px; font-size:1.5rem; }
+      .tool-grid { grid-template-columns:1fr; }
+      .tool-card { min-height:170px; }
+      .section-heading { align-items:flex-start; flex-direction:column; gap:3px; }
+      .section-note { text-align:left; }
+    }
   </style>
 </head>
 <body>
@@ -59,8 +88,14 @@
     <header class="topbar">
       <a class="brand" href="index.html" aria-label="little image thingies home">little image<br>thingies :3</a>
       <nav class="topbar-actions" aria-label="Site links">
-        <a class="discord-link" href="https://discord.gg/GNhbQbG5cB" target="_blank" rel="noopener noreferrer" aria-label="Join the Discord community" title="join the discord :3"><svg class="discord-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.54 4.64A16.4 16.4 0 0 0 15.49 3.4l-.5 1.02a15.2 15.2 0 0 0-5.98 0l-.5-1.02a16.5 16.5 0 0 0-4.05 1.24C1.9 8.45 1.2 12.18 1.54 15.86a16.3 16.3 0 0 0 4.97 2.5l1.21-1.63a9.45 9.45 0 0 1-1.9-.92l.46-.36c3.67 1.7 7.66 1.7 11.28 0l.46.36c-.61.36-1.25.67-1.91.92l1.21 1.63a16.2 16.2 0 0 0 4.97-2.5c.41-4.27-.7-7.96-2.76-11.22ZM8.68 13.6c-1.1 0-2-1.01-2-2.26s.88-2.26 2-2.26c1.13 0 2.02 1.02 2 2.26 0 1.25-.88 2.26-2 2.26Zm6.64 0c-1.1 0-2-1.01-2-2.26s.88-2.26 2-2.26c1.13 0 2.02 1.02 2 2.26 0 1.25-.87 2.26-2 2.26Z"/></svg><span>discord :3</span></a>
-        <div class="theme-picker" aria-label="Choose a color theme"><button class="theme-toggle" data-theme-toggle type="button" aria-expanded="false">themes :3</button><div class="theme-menu" data-theme-menu hidden><button type="button" class="theme-option" data-theme-choice="light">light mode :P</button><button type="button" class="theme-option" data-theme-choice="dark">dark mode :3</button><button type="button" class="theme-option" data-theme-choice="creamsicle">creamsicle :D</button></div></div>
+        <a class="discord-link" href="https://discord.gg/GNhbQbG5cB" target="_blank" rel="noopener noreferrer" aria-label="Join the Discord community" title="join the discord :3">
+          <svg class="discord-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.54 4.64A16.4 16.4 0 0 0 15.49 3.4l-.5 1.02a15.2 15.2 0 0 0-5.98 0l-.5-1.02a16.5 16.5 0 0 0-4.05 1.24C1.9 8.45 1.2 12.18 1.54 15.86a16.3 16.3 0 0 0 4.97 2.5l1.21-1.63a9.45 9.45 0 0 1-1.9-.92l.46-.36c3.67 1.7 7.66 1.7 11.28 0l.46.36c-.61.36-1.25.67-1.91.92l1.21 1.63a16.2 16.2 0 0 0 4.97-2.5c.41-4.27-.7-7.96-2.76-11.22ZM8.68 13.6c-1.1 0-2-1.01-2-2.26s.88-2.26 2-2.26c1.13 0 2.02 1.02 2 2.26 0 1.25-.88 2.26-2 2.26Zm6.64 0c-1.1 0-2-1.01-2-2.26s.88-2.26 2-2.26c1.13 0 2.02 1.02 2 2.26 0 1.25-.87 2.26-2 2.26Z"/></svg>
+          <span>discord :3</span>
+        </a>
+        <div class="theme-picker" aria-label="Choose a color theme">
+          <button class="theme-toggle" id="themeToggle" type="button" aria-expanded="false" aria-controls="themeMenu">themes :3</button>
+          <div class="theme-menu" id="themeMenu" hidden><button type="button" class="theme-option" data-theme-choice="light">light mode :P</button><button type="button" class="theme-option" data-theme-choice="dark">dark mode :3</button><button type="button" class="theme-option" data-theme-choice="creamsicle">creamsicle :D</button></div>
+        </div>
       </nav>
     </header>
     <section class="hero" aria-labelledby="heroTitle"><p class="eyebrow">free lil tools for ur images :]</p><h1 id="heroTitle">little image<br>thingies :3</h1><p class="hero-copy">a growing pile of cute, simple tools for fixing up images—background removal, resizing, profile pictures, file conversions, and more :D</p><div class="hero-actions"><a class="hero-button primary" href="tools/remove-background.html">remove a background :3</a><a class="hero-button" href="#tools">see all tool thingies</a></div></section>
@@ -68,9 +103,14 @@
     <section class="section" aria-labelledby="aboutTitle"><div class="info-grid"><article class="info-card"><h3 id="aboutTitle">a tiny heads up :]</h3><p>Some tools use limited shared AI processing, so results can vary and busy times may have limits. The browser-only tools stay free and do not use the shared AI budget.</p></article><article class="info-card"><h3>keep it alive? ♡</h3><p>Future support may help pay for API credits, hosting, improvements, and more useful tool thingies.</p><a class="support-button" href="#" id="supportLink">support coming soon :3</a></article></div></section>
     <footer>made with little pixels and a lot of :3 &nbsp;•&nbsp; <a href="https://discord.gg/GNhbQbG5cB" target="_blank" rel="noopener noreferrer">join the Discord</a></footer>
   </main>
-  <script src="assets/js/theme.js"></script>
   <script>
-    document.getElementById("supportLink").addEventListener("click",event=>{event.preventDefault();alert("support is not set up yet :[ but tysm for wanting to help keep the little tools alive ♡");});
+    const themeToggle=document.getElementById("themeToggle"),themeMenu=document.getElementById("themeMenu"),themeOptions=document.querySelectorAll("[data-theme-choice]"),supportLink=document.getElementById("supportLink");
+    function applyTheme(theme){document.documentElement.dataset.theme=theme==="light"?"":theme;localStorage.setItem("removy-theme",theme);themeToggle.textContent=theme==="light"?"light mode :P":theme==="dark"?"dark mode :3":"creamsicle :D";themeOptions.forEach(option=>option.setAttribute("aria-current",String(option.dataset.themeChoice===theme)));}
+    const savedTheme=localStorage.getItem("removy-theme")||"light";applyTheme(["light","dark","creamsicle"].includes(savedTheme)?savedTheme:"light");
+    themeToggle.addEventListener("click",()=>{const isOpen=!themeMenu.hidden;themeMenu.hidden=isOpen;themeToggle.setAttribute("aria-expanded",String(!isOpen));});
+    themeOptions.forEach(option=>option.addEventListener("click",()=>{applyTheme(option.dataset.themeChoice);themeMenu.hidden=true;themeToggle.setAttribute("aria-expanded","false");}));
+    document.addEventListener("click",event=>{if(!event.target.closest(".theme-picker")){themeMenu.hidden=true;themeToggle.setAttribute("aria-expanded","false");}});
+    supportLink.addEventListener("click",event=>{event.preventDefault();alert("support is not set up yet :[ but tysm for wanting to help keep the little tools alive ♡");});
   </script>
 </body>
 </html>
