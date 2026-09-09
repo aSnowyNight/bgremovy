@@ -13,7 +13,7 @@
     .topbar-actions { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:8px; }
     .discord-link,.back-link,.mode-button,.choose-button,.remove-button,.download-button,.reset-button { border:1.5px solid var(--border); border-radius:8px; color:var(--pink-dark); background:transparent; font:700 1rem "Gaegu","Comic Sans MS",cursive; cursor:pointer; text-decoration:none; transition:transform .15s ease,background .15s ease,color .15s ease,box-shadow .15s ease; }
     .discord-link { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:34px; padding:6px 10px 5px; font:700 .95rem/1 "Gaegu","Comic Sans MS",cursive; line-height:1; white-space:nowrap; }
-    .discord-icon { width:18px; height:18px; display:block; flex:0 0 18px; fill:currentColor; transform:none; }
+    .discord-icon { width:18px; height:18px; display:block; flex:0 0 18px; fill:currentColor; }
     .discord-link:hover,.back-link:hover,.reset-button:hover,.choose-button:hover { background:var(--pink-soft); transform:translateY(-1px); }
     .discord-link:focus-visible,.back-link:focus-visible,.mode-button:focus-visible,.choose-button:focus-visible,.remove-button:focus-visible,.download-button:focus-visible,.reset-button:focus-visible { outline:3px solid var(--pink-soft); outline-offset:3px; }
     .back-link { display:inline-flex; align-items:center; min-height:34px; margin-top:26px; padding:6px 9px; }
@@ -77,7 +77,12 @@
     .info-card p { margin:0; color:var(--muted); font-size:.86rem; line-height:1.48; }
     footer { margin-top:36px; color:var(--muted); text-align:center; font:400 .92rem/1.45 "Gaegu","Comic Sans MS",cursive; }
     footer a { color:var(--pink-dark); }
-    @media (max-width:620px) { .page { width:min(100% - 24px,960px); margin-top:18px; } .topbar { align-items:flex-start; gap:10px; } .brand { max-width:155px; } .topbar-actions { gap:5px; } .discord-link { display:grid; place-items:center; width:34px; height:34px; min-height:34px; padding:0; } .discord-link span { display:none; } .discord-icon { width:17px; height:17px; flex:none; } .mode-picker,.preview-grid,.info-grid { grid-template-columns:1fr; } .hero { padding:25px 20px; } }
+    [data-site-mode="professional"] .brand,[data-site-mode="professional"] h1,[data-site-mode="professional"] h2,[data-site-mode="professional"] .eyebrow,[data-site-mode="professional"] .back-link,[data-site-mode="professional"] .mode-title,[data-site-mode="professional"] .coming-soon,[data-site-mode="professional"] .budget-counter,[data-site-mode="professional"] .upload-card p,[data-site-mode="professional"] .choose-button,[data-site-mode="professional"] .upload-link,[data-site-mode="professional"] .tip,[data-site-mode="professional"] .result-placeholder,[data-site-mode="professional"] .loading,[data-site-mode="professional"] .remove-button,[data-site-mode="professional"] .download-button,[data-site-mode="professional"] .reset-button,[data-site-mode="professional"] footer { font-family:"Nunito",system-ui,sans-serif; }
+    [data-site-mode="professional"] .brand { font-size:clamp(1.15rem,3vw,1.5rem); line-height:1; letter-spacing:-.02em; }
+    [data-site-mode="professional"] h1 { font-weight:800; line-height:.98; letter-spacing:-.045em; }
+    [data-site-mode="professional"] h2 { font-weight:800; letter-spacing:-.025em; }
+    [data-site-mode="professional"] .eyebrow,[data-site-mode="professional"] .back-link,[data-site-mode="professional"] .mode-title,[data-site-mode="professional"] .coming-soon,[data-site-mode="professional"] .budget-counter,[data-site-mode="professional"] .choose-button,[data-site-mode="professional"] .upload-link,[data-site-mode="professional"] .tip,[data-site-mode="professional"] .result-placeholder,[data-site-mode="professional"] .loading,[data-site-mode="professional"] .remove-button,[data-site-mode="professional"] .download-button,[data-site-mode="professional"] .reset-button,[data-site-mode="professional"] footer { font-weight:700; }
+    @media (max-width:620px) { .page { width:min(100% - 24px,960px); margin-top:18px; } .topbar { align-items:flex-start; gap:10px; } .brand { max-width:155px; } .topbar-actions { gap:5px; } .site-mode-toggle { font-size:.85rem; } .discord-link { display:grid; place-items:center; width:34px; height:34px; min-height:34px; padding:0; } .discord-link span { display:none; } .discord-icon { width:17px; height:17px; flex:none; } .mode-picker,.preview-grid,.info-grid { grid-template-columns:1fr; } .hero { padding:25px 20px; } }
   </style>
 </head>
 <body>
@@ -85,10 +90,8 @@
     <header class="topbar">
       <a class="brand" href="../index.html" aria-label="little image thingies home">little image<br>thingies :3</a>
       <nav class="topbar-actions" aria-label="Site links">
-        <a class="discord-link" href="https://discord.gg/GNhbQbG5cB" target="_blank" rel="noopener noreferrer" aria-label="Join the Discord community" title="join the discord :3">
-          <svg class="discord-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.54 4.64A16.4 16.4 0 0 0 15.49 3.4l-.5 1.02a15.2 15.2 0 0 0-5.98 0l-.5-1.02a16.5 16.5 0 0 0-4.05 1.24C1.9 8.45 1.2 12.18 1.54 15.86a16.3 16.3 0 0 0 4.97 2.5l1.21-1.63a9.45 9.45 0 0 1-1.9-.92l.46-.36c3.67 1.7 7.66 1.7 11.28 0l.46.36c-.61.36-1.25.67-1.91.92l1.21 1.63a16.2 16.2 0 0 0 4.97-2.5c.41-4.27-.7-7.96-2.76-11.22ZM8.68 13.6c-1.1 0-2-1.01-2-2.26s.88-2.26 2-2.26c1.13 0 2.02 1.02 2 2.26 0 1.25-.88 2.26-2 2.26Zm6.64 0c-1.1 0-2-1.01-2-2.26s.88-2.26 2-2.26c1.13 0 2.02 1.02 2 2.26 0 1.25-.87 2.26-2 2.26Z"/></svg>
-          <span>discord :3</span>
-        </a>
+        <a class="discord-link" href="https://discord.gg/GNhbQbG5cB" target="_blank" rel="noopener noreferrer" aria-label="Join the Discord community" title="join the discord :3"><svg class="discord-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.54 4.64A16.4 16.4 0 0 0 15.49 3.4l-.5 1.02a15.2 15.2 0 0 0-5.98 0l-.5-1.02a16.5 16.5 0 0 0-4.05 1.24C1.9 8.45 1.2 12.18 1.54 15.86a16.3 16.3 0 0 0 4.97 2.5l1.21-1.63a9.45 9.45 0 0 1-1.9-.92l.46-.36c3.67 1.7 7.66 1.7 11.28 0l.46.36c-.61.36-1.25.67-1.91.92l1.21 1.63a16.2 16.2 0 0 0 4.97-2.5c.41-4.27-.7-7.96-2.76-11.22ZM8.68 13.6c-1.1 0-2-1.01-2-2.26s.88-2.26 2-2.26c1.13 0 2.02 1.02 2 2.26 0 1.25-.88 2.26-2 2.26Zm6.64 0c-1.1 0-2-1.01-2-2.26s.88-2.26 2-2.26c1.13 0 2.02 1.02 2 2.26 0 1.25-.87 2.26-2 2.26Z"/></svg><span>discord :3</span></a>
+        <button class="site-mode-toggle" data-site-mode-toggle type="button" aria-pressed="false" aria-label="Switch to professional mode" title="Switch to professional mode">professional mode</button>
         <div class="theme-picker" aria-label="Choose a color theme">
           <button class="theme-toggle" data-theme-toggle type="button" aria-expanded="false">themes :3</button>
           <div class="theme-menu" data-theme-menu hidden>
@@ -101,22 +104,22 @@
       </nav>
     </header>
 
-    <a class="back-link" href="../index.html">← all tool thingies</a>
+    <a class="back-link" href="../index.html" data-copy="remove-back">← all tool thingies</a>
 
     <section class="hero" aria-labelledby="pageTitle">
-      <p class="eyebrow">little image thingies • AI tool</p>
-      <h1 id="pageTitle">remove background :3</h1>
-      <p class="hero-copy">make a transparent PNG from a photo. cloud mode keeps the processing off your device, but uses a limited shared removy budget :]</p>
+      <p class="eyebrow" data-copy="remove-eyebrow">little image thingies • AI tool</p>
+      <h1 id="pageTitle" data-copy="remove-title">remove background :3</h1>
+      <p class="hero-copy" data-copy="remove-description">make a transparent PNG from a photo. cloud mode keeps the processing off your device, but uses a limited shared removy budget :]</p>
 
       <div class="mode-picker" aria-label="Background removal processing mode">
         <button class="mode-button active" id="cloudMode" type="button" aria-pressed="true">
-          <span class="mode-title">☁ cloud removy</span>
-          <span class="mode-description">the normal mode :3 processing happens on the server so your device stays chill.</span>
+          <span class="mode-title" data-copy="remove-cloud-title">☁ cloud removy</span>
+          <span class="mode-description" data-copy="remove-cloud-description">the normal mode :3 processing happens on the server so your device stays chill.</span>
         </button>
         <button class="mode-button" type="button" disabled aria-disabled="true">
-          <span class="coming-soon">coming soon :]</span>
-          <span class="mode-title">⌁ local + private</span>
-          <span class="mode-description">will run directly on your device with no shared credits, but may be slower on older devices.</span>
+          <span class="coming-soon" data-copy="remove-coming-soon">coming soon :]</span>
+          <span class="mode-title" data-copy="remove-local-title">⌁ local + private</span>
+          <span class="mode-description" data-copy="remove-local-description">will run directly on your device with no shared credits, but may be slower on older devices.</span>
         </button>
       </div>
 
@@ -124,43 +127,23 @@
     </section>
 
     <section class="workspace" aria-label="Upload and remove background">
-      <label class="upload-card" id="dropZone" for="fileInput">
-        <div>
-          <span class="upload-icon" aria-hidden="true">↑</span>
-          <p>put image here :P</p>
-          <span class="choose-button">choose image :3</span>
-        </div>
-      </label>
+      <label class="upload-card" id="dropZone" for="fileInput"><div><span class="upload-icon" aria-hidden="true">↑</span><p data-copy="remove-upload-title">put image here :P</p><span class="choose-button" data-copy="remove-upload-button">choose image :3</span></div></label>
       <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" />
-      <button class="upload-link" id="uploadLink" type="button">or upload an image :]</button>
-      <p class="tip">tip: clear subjects usually get the cleanest removies. JPG, PNG, and WebP up to 10 MB :3</p>
+      <button class="upload-link" id="uploadLink" type="button" data-copy="remove-upload-link">or upload an image :]</button>
+      <p class="tip" data-copy="remove-tip">tip: clear subjects usually get the cleanest removies. JPG, PNG, and WebP up to 10 MB :3</p>
       <p class="error" id="errorMessage" role="alert"></p>
 
       <section class="preview-section" id="previewSection" aria-live="polite">
         <div class="preview-grid">
-          <article class="preview-card">
-            <h2>before :]</h2>
-            <div class="image-area"><img id="originalPreview" alt="Your selected image" /></div>
-          </article>
-          <article class="preview-card">
-            <h2>after :3</h2>
-            <div class="image-area checkerboard">
-              <div class="loading" id="loadingState"><span class="spinner"></span><span>removy-ing background...</span></div>
-              <img id="resultPreview" alt="Image with its background removed" hidden />
-              <p class="result-placeholder" id="resultPlaceholder">click the removy button when ur ready :]</p>
-            </div>
-          </article>
+          <article class="preview-card"><h2 data-copy="remove-before">before :]</h2><div class="image-area"><img id="originalPreview" alt="Your selected image" /></div></article>
+          <article class="preview-card"><h2 data-copy="remove-after">after :3</h2><div class="image-area checkerboard"><div class="loading" id="loadingState"><span class="spinner"></span><span data-copy="remove-loading">removy-ing background...</span></div><img id="resultPreview" alt="Image with its background removed" hidden /><p class="result-placeholder" id="resultPlaceholder" data-copy="remove-placeholder">click the removy button when ur ready :]</p></div></article>
         </div>
-        <div class="controls">
-          <button class="remove-button" id="removeButton" type="button">remove background :3</button>
-          <a class="download-button" id="downloadButton" download="no-background.png" hidden>download transparent PNG :D</a>
-          <button class="reset-button" id="resetButton" type="button">choose another image</button>
-        </div>
+        <div class="controls"><button class="remove-button" id="removeButton" type="button" data-copy="remove-action">remove background :3</button><a class="download-button" id="downloadButton" download="no-background.png" hidden data-copy="remove-download">download transparent PNG :D</a><button class="reset-button" id="resetButton" type="button" data-copy="remove-reset">choose another image</button></div>
       </section>
 
       <div class="info-grid">
-        <article class="info-card"><h2>tiny heads up :]</h2><p>this is a beta removy thingy, so it might not perfectly remove every artifact—especially hair, fur, glass, shadows, and busy backgrounds.</p></article>
-        <article class="info-card"><h2>your privacy :3</h2><p>your image is only sent to the background-removal provider after you press remove background. please do not upload private or sensitive images.</p></article>
+        <article class="info-card"><h2 data-copy="remove-info-title">tiny heads up :]</h2><p data-copy="remove-info-text">this is a beta removy thingy, so it might not perfectly remove every artifact—especially hair, fur, glass, shadows, and busy backgrounds.</p></article>
+        <article class="info-card"><h2 data-copy="remove-privacy-title">your privacy :3</h2><p data-copy="remove-privacy-text">your image is only sent to the background-removal provider after you press remove background. please do not upload private or sensitive images.</p></article>
       </div>
     </section>
 
@@ -168,6 +151,7 @@
   </main>
 
   <script src="../assets/js/theme.js"></script>
+  <script src="../assets/js/site-mode.js"></script>
   <script>
     const API_ENDPOINT = "/api/remove-background";
     const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -184,34 +168,24 @@
     const resetButton = document.getElementById("resetButton");
     const errorMessage = document.getElementById("errorMessage");
     const loadingState = document.getElementById("loadingState");
-
     let selectedFile = null;
     let originalUrl = null;
     let resultUrl = null;
     let callsLeft = Infinity;
 
-    function setError(message = "") {
-      errorMessage.textContent = message;
-    }
-
-    function revokeUrl(url) {
-      if (url) URL.revokeObjectURL(url);
-    }
-
+    function setError(message = "") { errorMessage.textContent = message; }
+    function revokeUrl(url) { if (url) URL.revokeObjectURL(url); }
     function updateBudgetCounter(nextCallsLeft) {
       if (!Number.isFinite(nextCallsLeft)) return;
       callsLeft = Math.max(0, Math.floor(nextCallsLeft));
       budgetCounter.classList.toggle("low", callsLeft > 0 && callsLeft <= 15);
       budgetCounter.classList.toggle("empty", callsLeft === 0);
-      budgetCounter.innerHTML = callsLeft === 0
-        ? 'free removies left: <span class="budget-number">0</span> :[ more soon maybe'
-        : `free removies left: <span class="budget-number">${callsLeft}</span> :3`;
+      budgetCounter.innerHTML = callsLeft === 0 ? 'free removies left: <span class="budget-number">0</span> :[ more soon maybe' : `free removies left: <span class="budget-number">${callsLeft}</span> :3`;
       if (selectedFile) removeButton.disabled = callsLeft <= 0;
     }
-
     async function loadLiveBudget() {
       try {
-        const response = await fetch("/api/budget", { cache: "no-store" });
+        const response = await fetch("/api/budget", { cache:"no-store" });
         if (!response.ok) throw new Error();
         const data = await response.json();
         updateBudgetCounter(data.callsLeft);
@@ -219,19 +193,11 @@
         budgetCounter.innerHTML = 'free removies left: <span class="budget-number">unknown</span> :[';
       }
     }
-
     function selectFile(file) {
       setError();
       if (!file) return;
-      if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-        setError("please choose a PNG, JPG, or WebP image :[");
-        return;
-      }
-      if (file.size > MAX_FILE_SIZE) {
-        setError("that image is over 10 MB—please pick a smaller one :[");
-        return;
-      }
-
+      if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) return setError("please choose a PNG, JPG, or WebP image :[");
+      if (file.size > MAX_FILE_SIZE) return setError("that image is over 10 MB—please pick a smaller one :[");
       selectedFile = file;
       revokeUrl(originalUrl);
       revokeUrl(resultUrl);
@@ -245,43 +211,27 @@
       previewSection.classList.add("visible");
       removeButton.disabled = callsLeft <= 0;
     }
-
     async function removeBackground() {
       if (!selectedFile || callsLeft <= 0) {
         if (callsLeft <= 0) setError("the free removy budget is used up for now :[");
         return;
       }
-
       setError();
       removeButton.disabled = true;
       loadingState.classList.add("visible");
-
       try {
         const formData = new FormData();
         formData.append("image", selectedFile, selectedFile.name);
-
-        const response = await fetch(API_ENDPOINT, {
-          method: "POST",
-          body: formData
-        });
-
+        const response = await fetch(API_ENDPOINT, { method:"POST", body:formData });
         if (!response.ok) {
           let message = "the removy thingy had a little oopsie. please try again :[";
-          try {
-            const data = await response.json();
-            message = data.error || message;
-          } catch (_) {}
+          try { const data = await response.json(); message = data.error || message; } catch (_) {}
           throw new Error(message);
         }
-
         const imageBlob = await response.blob();
-        if (!imageBlob.type.startsWith("image/")) {
-          throw new Error("the server did not return an image. please try again :[");
-        }
-
+        if (!imageBlob.type.startsWith("image/")) throw new Error("the server did not return an image. please try again :[");
         const remaining = Number(response.headers.get("X-Removy-Calls-Left"));
         if (Number.isFinite(remaining)) updateBudgetCounter(remaining);
-
         revokeUrl(resultUrl);
         resultUrl = URL.createObjectURL(imageBlob);
         resultPreview.src = resultUrl;
@@ -296,7 +246,6 @@
         removeButton.disabled = callsLeft <= 0;
       }
     }
-
     function resetApp() {
       selectedFile = null;
       fileInput.value = "";
@@ -312,29 +261,14 @@
       previewSection.classList.remove("visible");
       setError();
     }
-
     loadLiveBudget();
     setInterval(loadLiveBudget, 60000);
-
     uploadLink.addEventListener("click", () => fileInput.click());
     fileInput.addEventListener("change", () => selectFile(fileInput.files[0]));
     removeButton.addEventListener("click", removeBackground);
     resetButton.addEventListener("click", resetApp);
-
-    ["dragenter", "dragover"].forEach((name) => {
-      dropZone.addEventListener(name, (event) => {
-        event.preventDefault();
-        dropZone.classList.add("dragover");
-      });
-    });
-
-    ["dragleave", "drop"].forEach((name) => {
-      dropZone.addEventListener(name, (event) => {
-        event.preventDefault();
-        dropZone.classList.remove("dragover");
-      });
-    });
-
+    ["dragenter", "dragover"].forEach((name) => dropZone.addEventListener(name, (event) => { event.preventDefault(); dropZone.classList.add("dragover"); }));
+    ["dragleave", "drop"].forEach((name) => dropZone.addEventListener(name, (event) => { event.preventDefault(); dropZone.classList.remove("dragover"); }));
     dropZone.addEventListener("drop", (event) => selectFile(event.dataTransfer.files[0]));
   </script>
 </body>
