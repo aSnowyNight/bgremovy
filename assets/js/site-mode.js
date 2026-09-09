@@ -2,73 +2,301 @@
   const STORAGE_KEY = "little-image-site-mode";
   const PROFESSIONAL = "professional";
   const PLAYFUL = "playful";
+  const DEFAULT_MODE = PLAYFUL;
 
-  const data = {
+  const copy = {
     professional: {
-      resize: [
-        ["resize-back", "← All tools"], ["resize-eyebrow", "Browser-based image editor"], ["resize-title", "Resize and crop"], ["resize-description", "Crop, resize, rotate, and export an image directly in your browser."],
-        ["resize-upload-title", "Drop an image here"], ["resize-upload-button", "Choose image"], ["resize-upload-link", "Or select an image"], ["resize-tip", "PNG, JPG, and WebP files up to 15 MB are supported. Your image stays on this device."],
-        ["resize-editor-title", "Crop and resize"], ["resize-width", "Width"], ["resize-height", "Height"], ["resize-lock", "Keep aspect ratio"], ["resize-crop-ratio", "Crop ratio"], ["resize-free", "Free"], ["resize-zoom", "Zoom"], ["resize-rotate-left", "Rotate left"], ["resize-rotate-right", "Rotate right"], ["resize-format", "Export format"], ["resize-download", "Download image"], ["resize-reset", "Choose another image"], ["resize-privacy-title", "Private editing"], ["resize-privacy-text", "All resizing and cropping runs locally in your browser."], ["resize-tips-title", "Tips"], ["resize-tips-text", "Drag the image to position it in the crop area. Use a ratio preset for common social and video formats."]
-      ],
-      compress: [
-        ["compress-back", "← All tools"], ["compress-eyebrow", "Browser-based image tool"], ["compress-title", "Compress image"], ["compress-description", "Reduce image file size directly in your browser without uploading it anywhere."],
-        ["compress-upload-title", "Drop an image here"], ["compress-upload-button", "Choose image"], ["compress-upload-link", "Or select an image"], ["compress-tip", "PNG, JPG, and WebP files up to 20 MB are supported. Your image stays on this device."],
-        ["compress-settings-title", "Compression settings"], ["compress-preset", "Compression level"], ["compress-gentle", "Gentle"], ["compress-balanced", "Balanced"], ["compress-small", "Smallest file"], ["compress-quality", "Quality"], ["compress-format", "Output format"], ["compress-action", "Compress image"], ["compress-download", "Download compressed image"], ["compress-reset", "Choose another image"], ["compress-results-title", "Results"], ["compress-original", "Original size"], ["compress-result", "Compressed size"], ["compress-saved", "Space saved"], ["compress-privacy-title", "Private processing"], ["compress-privacy-text", "Compression runs locally in your browser. Your image is never uploaded."], ["compress-note-title", "Format note"], ["compress-note-text", "PNG preserves transparency. JPG does not support transparency, and transparent areas are rendered on white."]
-      ],
-      convert: [
-        ["convert-back", "← All tools"], ["convert-eyebrow", "Browser-based image tool"], ["convert-title", "Convert image"], ["convert-description", "Convert PNG, JPG, and WebP images directly in your browser."],
-        ["convert-upload-title", "Drop an image here"], ["convert-upload-button", "Choose image"], ["convert-upload-link", "Or select an image"], ["convert-tip", "PNG, JPG, and WebP files up to 20 MB are supported. Your image stays on this device."],
-        ["convert-settings-title", "Conversion settings"], ["convert-output", "Convert to"], ["convert-quality", "Quality"], ["convert-action", "Convert image"], ["convert-download", "Download converted image"], ["convert-reset", "Choose another image"], ["convert-original-format", "Original format"], ["convert-output-format", "Output format"], ["convert-dimensions", "Dimensions"], ["convert-file-size", "Output size"], ["convert-privacy-title", "Private processing"], ["convert-privacy-text", "Conversion runs locally in your browser. Your image is never uploaded."], ["convert-note-title", "Format note"], ["convert-note-text", "PNG retains transparency. JPG does not support it, so transparent areas are rendered on white."]
-      ],
-      pfp: [
-        ["pfp-back", "← All tools"], ["pfp-eyebrow", "Browser-based profile image tool"], ["pfp-title", "Make a profile picture"], ["pfp-description", "Create a square profile image with a frame, background, and precise positioning controls."],
-        ["pfp-upload-title", "Drop an image here"], ["pfp-upload-button", "Choose image"], ["pfp-upload-link", "Or select an image"], ["pfp-tip", "PNG, JPG, and WebP files up to 15 MB are supported. Your image stays on this device."],
-        ["pfp-editor-title", "Profile picture editor"], ["pfp-shape", "Photo shape"], ["pfp-circle", "Circle"], ["pfp-rounded", "Rounded square"], ["pfp-square", "Square"], ["pfp-background", "Background color"], ["pfp-frame", "Frame thickness"], ["pfp-zoom", "Photo zoom"], ["pfp-size", "Output size"], ["pfp-format", "Export format"], ["pfp-download", "Download profile picture"], ["pfp-reset", "Choose another image"], ["pfp-privacy-title", "Private editing"], ["pfp-privacy-text", "Your image remains in your browser throughout the editing process."], ["pfp-tips-title", "Tips"], ["pfp-tips-text", "Drag the image to position it. A close, centered crop generally works best at small profile-picture sizes."]
-      ],
-      qr: [
-        ["qr-back", "← All tools"], ["qr-eyebrow", "Browser-based generator"], ["qr-title", "QR code maker"], ["qr-description", "Generate a customizable QR code for a website, message, invite, or other text."],
-        ["qr-content-title", "QR code content"], ["qr-content-label", "Link or text"], ["qr-placeholder", "Paste a URL or enter text"], ["qr-discord", "Discord invite"], ["qr-website", "Website URL"], ["qr-message", "Message"], ["qr-settings-title", "Design settings"], ["qr-foreground", "Foreground color"], ["qr-background", "Background color"], ["qr-size", "Download size"], ["qr-generate", "Generate QR code"], ["qr-download-png", "Download PNG"], ["qr-download-svg", "Download SVG"], ["qr-note-title", "Scanning tip"], ["qr-note-text", "Use high contrast between the foreground and background. Test the code with a phone before sharing or printing it."], ["qr-privacy-title", "Private generation"], ["qr-privacy-text", "QR codes are generated directly in your browser. The entered text is not uploaded."]
-      ]
+      toggle: ":3 mode",
+      home: {
+        eyebrow: "Free image tools",
+        title: "Image tools that stay simple",
+        description: "A growing collection of straightforward tools for removing backgrounds, resizing, cropping, converting files, and preparing images for wherever they need to go.",
+        primary: "Remove a background",
+        secondary: "Browse all tools",
+        toolsHeading: "Image tools",
+        toolsNote: "More tools are in development",
+        removeName: "Remove background",
+        removeDescription: "Turn a photo into a transparent PNG in a few clicks.",
+        changeName: "Change background",
+        changeDescription: "Place a color, gradient, or image behind a cutout.",
+        resizeName: "Resize and crop",
+        resizeDescription: "Prepare images for profile photos, banners, posts, and more."
+      },
+      changeBackground: {
+        back: "← All tools",
+        eyebrow: "Image background editor",
+        title: "Change background",
+        description: "Place a solid color, gradient, or a different image behind a transparent cutout. Editing happens directly in your browser.",
+        badge: "Browser-based • no upload required",
+        uploadTitle: "Drop a transparent image here",
+        uploadButton: "Choose cutout image",
+        uploadLink: "or select a transparent image",
+        tip: "For best results, use a PNG or WebP image with a transparent background.",
+        previewTitle: "Preview",
+        controlsTitle: "Background settings",
+        presets: "Background presets",
+        color: "Choose a color",
+        backgroundImage: "Use a background image",
+        backgroundUpload: "Upload background image",
+        backgroundHelp: "Your cutout remains in front of the background image.",
+        zoom: "Cutout zoom",
+        zoomHelp: "Drag the cutout in the preview to reposition it.",
+        fit: "Background image fit",
+        cover: "Cover",
+        contain: "Contain",
+        download: "Download",
+        downloadPng: "Download PNG",
+        downloadJpg: "Download JPG",
+        downloadHelp: "PNG preserves the highest quality. JPG files are usually smaller.",
+        reset: "Start over",
+        privacyTitle: "Private editing",
+        privacyText: "This tool layers your cutout over a new background in your browser. Your images remain on your device while you edit.",
+        resultsTitle: "Best results",
+        resultsText: "Use a transparent cutout image. If your image still has its original background, remove it first, then bring the cutout back here."
+      },
+      removeBackground: {
+        back: "← All tools",
+        eyebrow: "Background removal tool",
+        title: "Remove background",
+        description: "Create a transparent PNG from a photo. Processing is handled securely on the server and uses a limited shared usage budget.",
+        cloudTitle: "☁ Cloud processing",
+        cloudDescription: "Processing runs on the server, keeping the work off your device.",
+        comingSoon: "Coming soon",
+        localTitle: "⌁ Local and private",
+        localDescription: "Will run directly on your device with no shared usage budget, but may be slower on older devices.",
+        uploadTitle: "Drop an image here",
+        uploadButton: "Choose image",
+        uploadLink: "or select an image",
+        tip: "Clear subjects typically produce the cleanest results. PNG, JPG, and WebP files up to 10 MB are supported.",
+        before: "Original",
+        after: "Result",
+        loading: "Removing background…",
+        placeholder: "Select an image, then choose Remove background.",
+        action: "Remove background",
+        download: "Download transparent PNG",
+        reset: "Choose another image",
+        infoTitle: "Important note",
+        infoText: "This tool is in beta. Results can be less precise around hair, fur, glass, shadows, and busy backgrounds.",
+        privacyTitle: "Privacy",
+        privacyText: "Your image is sent to the background-removal provider only after you select Remove background. Do not upload private or sensitive images."
+      }
     },
     playful: {
-      resize: [["resize-back", "← all tool thingies"], ["resize-eyebrow", "little image thingies • browser tool"], ["resize-title", "resize + crop :3"], ["resize-description", "crop, resize, spin, and download ur image right in the browser :]"], ["resize-upload-title", "put image here :P"], ["resize-upload-button", "choose image :3"], ["resize-upload-link", "or upload an image :]"], ["resize-tip", "JPG, PNG, and WebP up to 15 MB. it stays on ur device :3"], ["resize-editor-title", "make it fit :D"], ["resize-width", "width"], ["resize-height", "height"], ["resize-lock", "keep the shape"], ["resize-crop-ratio", "crop shape"], ["resize-free", "freeform"], ["resize-zoom", "zoom"], ["resize-rotate-left", "spin left"], ["resize-rotate-right", "spin right"], ["resize-format", "download type"], ["resize-download", "download image :D"], ["resize-reset", "choose another image"], ["resize-privacy-title", "quick + private :]"], ["resize-privacy-text", "all the resizing and cropping happens right in ur browser."], ["resize-tips-title", "tiny tip :3"], ["resize-tips-text", "drag the image around to place it. use the shape buttons for common post and profile pic sizes."]],
-      compress: [["compress-back", "← all tool thingies"], ["compress-eyebrow", "little image thingies • browser tool"], ["compress-title", "compress image :3"], ["compress-description", "make image files smaller without sending them anywhere :]"], ["compress-upload-title", "put image here :P"], ["compress-upload-button", "choose image :3"], ["compress-upload-link", "or upload an image :]"], ["compress-tip", "JPG, PNG, and WebP up to 20 MB. it stays on ur device :3"], ["compress-settings-title", "make it smaller :D"], ["compress-preset", "squish amount"], ["compress-gentle", "gentle"], ["compress-balanced", "balanced"], ["compress-small", "tiny file"], ["compress-quality", "quality"], ["compress-format", "save as"], ["compress-action", "compress image :3"], ["compress-download", "download squished image :D"], ["compress-reset", "choose another image"], ["compress-results-title", "how it went :]"], ["compress-original", "before"], ["compress-result", "after"], ["compress-saved", "space saved"], ["compress-privacy-title", "quick + private :]"], ["compress-privacy-text", "the squishing happens right in ur browser. ur image never gets uploaded."], ["compress-note-title", "little format note"], ["compress-note-text", "PNG keeps transparent bits. JPG cannot do transparency, so clear bits get a white background."]],
-      convert: [["convert-back", "← all tool thingies"], ["convert-eyebrow", "little image thingies • browser tool"], ["convert-title", "convert image :3"], ["convert-description", "turn PNGs, JPGs, and WebPs into other image thingies right in ur browser :]"], ["convert-upload-title", "put image here :P"], ["convert-upload-button", "choose image :3"], ["convert-upload-link", "or upload an image :]"], ["convert-tip", "PNG, JPG, and WebP up to 20 MB. it stays on ur device :3"], ["convert-settings-title", "turn it into a new thingy :D"], ["convert-output", "turn it into"], ["convert-quality", "quality"], ["convert-action", "convert image :3"], ["convert-download", "download new image :D"], ["convert-reset", "choose another image"], ["convert-original-format", "started as"], ["convert-output-format", "turned into"], ["convert-dimensions", "size"], ["convert-file-size", "new file size"], ["convert-privacy-title", "quick + private :]"], ["convert-privacy-text", "the converting happens right in ur browser. ur image never gets uploaded."], ["convert-note-title", "little format note"], ["convert-note-text", "PNG keeps transparent bits. JPG cannot do transparency, so clear bits get a white background."]],
-      pfp: [["pfp-back", "← all tool thingies"], ["pfp-eyebrow", "little image thingies • browser tool"], ["pfp-title", "make a pfp :D"], ["pfp-description", "make a cute square profile picture with a frame, background, and all the little adjustments :]"], ["pfp-upload-title", "put image here :P"], ["pfp-upload-button", "choose image :3"], ["pfp-upload-link", "or upload an image :]"], ["pfp-tip", "PNG, JPG, and WebP up to 15 MB. it stays on ur device :3"], ["pfp-editor-title", "make it cute :D"], ["pfp-shape", "photo shape"], ["pfp-circle", "circle"], ["pfp-rounded", "rounded square"], ["pfp-square", "square"], ["pfp-background", "background color"], ["pfp-frame", "frame thickness"], ["pfp-zoom", "photo zoom"], ["pfp-size", "download size"], ["pfp-format", "save as"], ["pfp-download", "download pfp :D"], ["pfp-reset", "choose another image"], ["pfp-privacy-title", "quick + private :]"], ["pfp-privacy-text", "ur image stays right in ur browser while u make the pfp."], ["pfp-tips-title", "tiny tip :3"], ["pfp-tips-text", "drag ur picture to move it around. a close, centered crop usually looks best when it gets small."]],
-      qr: [["qr-back", "← all tool thingies"], ["qr-eyebrow", "little image thingies • browser tool"], ["qr-title", "QR maker :3"], ["qr-description", "make a scan-y square for a link, invite, message, or whatever else :]"], ["qr-content-title", "what should it say?"], ["qr-content-label", "link or words"], ["qr-placeholder", "paste a link or type something"], ["qr-discord", "Discord invite"], ["qr-website", "website link"], ["qr-message", "message"], ["qr-settings-title", "make it pretty :D"], ["qr-foreground", "square color"], ["qr-background", "background color"], ["qr-size", "download size"], ["qr-generate", "make QR code :3"], ["qr-download-png", "download PNG :D"], ["qr-download-svg", "download SVG :]"], ["qr-note-title", "tiny scan tip"], ["qr-note-text", "keep the square bits and background really different colors. test it with ur phone before sharing it."], ["qr-privacy-title", "quick + private :]"], ["qr-privacy-text", "the QR code is made right in ur browser. the text never gets uploaded."]]
+      toggle: "professional mode",
+      home: {
+        eyebrow: "free lil tools for ur images :]",
+        title: "little image<br>thingies :3",
+        description: "a growing pile of cute, simple tools for fixing up images—background removal, resizing, profile pictures, file conversions, and more :D",
+        primary: "remove a background :3",
+        secondary: "see all tool thingies",
+        toolsHeading: "tool thingies :3",
+        toolsNote: "more little things are on the way",
+        removeName: "remove background",
+        removeDescription: "turn a photo into a transparent PNG with one little click.",
+        changeName: "change background",
+        changeDescription: "put a color, gradient, or another image behind your cutout.",
+        resizeName: "resize + crop",
+        resizeDescription: "make images fit profile pics, banners, posts, and more."
+      },
+      changeBackground: {
+        back: "← all tool thingies",
+        eyebrow: "little image thingies • browser tool",
+        title: "change background :3",
+        description: "put a color, gradient, or another image behind a transparent PNG. everything happens right in your browser—quick, private, and free :D",
+        badge: "♡ browser-side • no upload needed",
+        uploadTitle: "put transparent PNG here :P",
+        uploadButton: "choose cutout image :3",
+        uploadLink: "or upload a transparent PNG :]",
+        tip: "this works best with a PNG that already has its background removed :3",
+        previewTitle: "your new background :D",
+        controlsTitle: "make it pretty :3",
+        presets: "background presets",
+        color: "or pick a color",
+        backgroundImage: "use an image behind it",
+        backgroundUpload: "upload background image :]",
+        backgroundHelp: "your cutout stays in front. use the buttons below to fit it.",
+        zoom: "cutout zoom",
+        zoomHelp: "drag the cutout directly in the preview to move it :]",
+        fit: "background image fit",
+        cover: "cover",
+        contain: "contain",
+        download: "download",
+        downloadPng: "download PNG :D",
+        downloadJpg: "download JPG :]",
+        downloadHelp: "PNG keeps the best quality. JPG is smaller but cannot be transparent.",
+        reset: "start over",
+        privacyTitle: "quick + private :]",
+        privacyText: "this tool layers your cutout over a new background right in your browser. your image stays on your device while you edit it.",
+        resultsTitle: "best results :3",
+        resultsText: "this works best with a transparent cutout image. if your picture still has its original background, make a transparent PNG first, then bring it back here."
+      },
+      removeBackground: {
+        back: "← all tool thingies",
+        eyebrow: "little image thingies • AI tool",
+        title: "remove background :3",
+        description: "make a transparent PNG from a photo. cloud mode keeps the processing off your device, but uses a limited shared removy budget :]",
+        cloudTitle: "☁ cloud removy",
+        cloudDescription: "the normal mode :3 processing happens on the server so your device stays chill.",
+        comingSoon: "coming soon :]",
+        localTitle: "⌁ local + private",
+        localDescription: "will run directly on your device with no shared credits, but may be slower on older devices.",
+        uploadTitle: "put image here :P",
+        uploadButton: "choose image :3",
+        uploadLink: "or upload an image :]",
+        tip: "tip: clear subjects usually get the cleanest removies. JPG, PNG, and WebP up to 10 MB :3",
+        before: "before :]",
+        after: "after :3",
+        loading: "removy-ing background...",
+        placeholder: "click the removy button when ur ready :]",
+        action: "remove background :3",
+        download: "download transparent PNG :D",
+        reset: "choose another image",
+        infoTitle: "tiny heads up :]",
+        infoText: "this is a beta removy thingy, so it might not perfectly remove every artifact—especially hair, fur, glass, shadows, and busy backgrounds.",
+        privacyTitle: "your privacy :3",
+        privacyText: "your image is only sent to the background-removal provider after you press remove background. please do not upload private or sensitive images."
+      }
     }
   };
 
-  function setText(marker, value) {
-    document.querySelectorAll(`[data-copy="${marker}"]`).forEach((node) => { node.textContent = value; });
+  function getMode() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored === PROFESSIONAL || stored === PLAYFUL ? stored : DEFAULT_MODE;
+    } catch (_) {
+      return DEFAULT_MODE;
+    }
   }
 
-  function updateNewTools(mode) {
-    Object.values(data[mode]).forEach((entries) => entries.forEach(([marker, value]) => setText(marker, value)));
+  function setText(selector, value, allowHtml = false) {
+    document.querySelectorAll(selector).forEach((element) => {
+      if (allowHtml) element.innerHTML = value;
+      else element.textContent = value;
+    });
   }
 
-  function runCompatibilityLayer() {
-    const current = localStorage.getItem(STORAGE_KEY) === PROFESSIONAL ? PROFESSIONAL : PLAYFUL;
-    document.documentElement.dataset.siteMode = current;
-    updateNewTools(current);
+  function applyHomeCopy(words) {
+    if (!document.querySelector("[data-copy='home-title']")) return;
+    setText("[data-copy='home-eyebrow']", words.eyebrow);
+    setText("[data-copy='home-title']", words.title, true);
+    setText("[data-copy='home-description']", words.description);
+    setText("[data-copy='home-primary']", words.primary);
+    setText("[data-copy='home-secondary']", words.secondary);
+    setText("[data-copy='tools-heading']", words.toolsHeading);
+    setText("[data-copy='tools-note']", words.toolsNote);
+    setText("[data-copy='remove-name']", words.removeName);
+    setText("[data-copy='remove-description']", words.removeDescription);
+    setText("[data-copy='change-name']", words.changeName);
+    setText("[data-copy='change-description']", words.changeDescription);
+    setText("[data-copy='resize-name']", words.resizeName);
+    setText("[data-copy='resize-description']", words.resizeDescription);
+  }
+
+  function applyChangeBackgroundCopy(words) {
+    if (!document.querySelector("[data-copy='change-title']")) return;
+    setText("[data-copy='change-back']", words.back);
+    setText("[data-copy='change-eyebrow']", words.eyebrow);
+    setText("[data-copy='change-title']", words.title);
+    setText("[data-copy='change-description']", words.description);
+    setText("[data-copy='change-badge']", words.badge);
+    setText("[data-copy='change-upload-title']", words.uploadTitle);
+    setText("[data-copy='change-upload-button']", words.uploadButton);
+    setText("[data-copy='change-upload-link']", words.uploadLink);
+    setText("[data-copy='change-tip']", words.tip);
+    setText("[data-copy='change-preview-title']", words.previewTitle);
+    setText("[data-copy='change-controls-title']", words.controlsTitle);
+    setText("[data-copy='change-presets']", words.presets);
+    setText("[data-copy='change-color']", words.color);
+    setText("[data-copy='change-background-image']", words.backgroundImage);
+    setText("[data-copy='change-background-upload']", words.backgroundUpload);
+    setText("[data-copy='change-background-help']", words.backgroundHelp);
+    setText("[data-copy='change-zoom']", words.zoom);
+    setText("[data-copy='change-zoom-help']", words.zoomHelp);
+    setText("[data-copy='change-fit']", words.fit);
+    setText("[data-copy='change-cover']", words.cover);
+    setText("[data-copy='change-contain']", words.contain);
+    setText("[data-copy='change-download']", words.download);
+    setText("[data-copy='change-download-png']", words.downloadPng);
+    setText("[data-copy='change-download-jpg']", words.downloadJpg);
+    setText("[data-copy='change-download-help']", words.downloadHelp);
+    setText("[data-copy='change-reset']", words.reset);
+    setText("[data-copy='change-privacy-title']", words.privacyTitle);
+    setText("[data-copy='change-privacy-text']", words.privacyText);
+    setText("[data-copy='change-results-title']", words.resultsTitle);
+    setText("[data-copy='change-results-text']", words.resultsText);
+  }
+
+  function applyRemoveBackgroundCopy(words) {
+    if (!document.querySelector("[data-copy='remove-title']")) return;
+    setText("[data-copy='remove-back']", words.back);
+    setText("[data-copy='remove-eyebrow']", words.eyebrow);
+    setText("[data-copy='remove-title']", words.title);
+    setText("[data-copy='remove-description']", words.description);
+    setText("[data-copy='remove-cloud-title']", words.cloudTitle);
+    setText("[data-copy='remove-cloud-description']", words.cloudDescription);
+    setText("[data-copy='remove-coming-soon']", words.comingSoon);
+    setText("[data-copy='remove-local-title']", words.localTitle);
+    setText("[data-copy='remove-local-description']", words.localDescription);
+    setText("[data-copy='remove-upload-title']", words.uploadTitle);
+    setText("[data-copy='remove-upload-button']", words.uploadButton);
+    setText("[data-copy='remove-upload-link']", words.uploadLink);
+    setText("[data-copy='remove-tip']", words.tip);
+    setText("[data-copy='remove-before']", words.before);
+    setText("[data-copy='remove-after']", words.after);
+    setText("[data-copy='remove-loading']", words.loading);
+    setText("[data-copy='remove-placeholder']", words.placeholder);
+    setText("[data-copy='remove-action']", words.action);
+    setText("[data-copy='remove-download']", words.download);
+    setText("[data-copy='remove-reset']", words.reset);
+    setText("[data-copy='remove-info-title']", words.infoTitle);
+    setText("[data-copy='remove-info-text']", words.infoText);
+    setText("[data-copy='remove-privacy-title']", words.privacyTitle);
+    setText("[data-copy='remove-privacy-text']", words.privacyText);
+  }
+
+  function applyMode(mode, save = true) {
+    const selected = mode === PROFESSIONAL ? PROFESSIONAL : PLAYFUL;
+    const words = copy[selected];
+    document.documentElement.dataset.siteMode = selected;
+
+    if (save) {
+      try {
+        localStorage.setItem(STORAGE_KEY, selected);
+      } catch (_) {}
+    }
+
+    document.querySelectorAll("[data-site-mode-toggle]").forEach((button) => {
+      button.textContent = words.toggle;
+      button.setAttribute("aria-pressed", String(selected === PROFESSIONAL));
+      const label = selected === PLAYFUL ? "Switch to professional mode" : "Switch to playful mode :3";
+      button.setAttribute("aria-label", label);
+      button.setAttribute("title", label);
+    });
+
+    applyHomeCopy(words.home);
+    applyChangeBackgroundCopy(words.changeBackground);
+    applyRemoveBackgroundCopy(words.removeBackground);
+  }
+
+  function initialize() {
+    applyMode(getMode(), false);
+
     document.querySelectorAll("[data-site-mode-toggle]").forEach((button) => {
       button.addEventListener("click", () => {
-        window.setTimeout(() => {
-          const mode = localStorage.getItem(STORAGE_KEY) === PROFESSIONAL ? PROFESSIONAL : PLAYFUL;
-          document.documentElement.dataset.siteMode = mode;
-          updateNewTools(mode);
-        }, 0);
+        applyMode(getMode() === PLAYFUL ? PROFESSIONAL : PLAYFUL);
       });
     });
+
     window.addEventListener("storage", (event) => {
       if (event.key === STORAGE_KEY) {
-        const mode = event.newValue === PROFESSIONAL ? PROFESSIONAL : PLAYFUL;
-        document.documentElement.dataset.siteMode = mode;
-        updateNewTools(mode);
+        applyMode(event.newValue, false);
       }
     });
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", runCompatibilityLayer, { once: true });
-  else runCompatibilityLayer();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initialize, { once: true });
+  } else {
+    initialize();
+  }
 })();
