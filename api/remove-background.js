@@ -13,7 +13,7 @@ const GLOBAL_BETA_LIMIT = 90;
 const redis = Redis.fromEnv();
 const visitorLimit = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(2, "1 h"),
+  limiter: Ratelimit.slidingWindow(8, "10 m"),
   prefix: "removy-visitor"
 });
 
